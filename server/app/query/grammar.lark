@@ -1,0 +1,80 @@
+?start: query
+
+query: main_query group_by_clause?
+
+main_query: compound_query
+          | empty_query
+
+empty_query:
+
+group_by_clause: "group_by"i "(" group_by_tokens ")"
+
+group_by_tokens: group_by_token ("," group_by_token)*
+
+group_by_token: session_id_token
+              | tag_token
+
+tag_token: "#" quoted_string
+
+compound_query: atomic_query (logical_op atomic_query)*
+
+logical_op: and_op | or_op
+
+atomic_query: session_query
+            | tag_query  
+            | tag_assignment_query
+            | id_query
+            | name_query
+            | classname_query
+            | testsuite_query
+            | file_query
+            | status_query
+
+session_query: session_id_token COMPARISON_OP quoted_string
+
+session_id_token: "session_id"i
+
+tag_query: negated_tag_query
+        | regular_tag_query
+
+negated_tag_query: "!" "#" quoted_string
+
+regular_tag_query: "#" quoted_string
+
+tag_assignment_query: "#" quoted_string COMPARISON_OP quoted_string
+
+id_query: id_token COMPARISON_OP quoted_string
+
+name_query: name_token COMPARISON_OP quoted_string
+
+classname_query: classname_token COMPARISON_OP quoted_string
+
+testsuite_query: testsuite_token COMPARISON_OP quoted_string
+
+file_query: file_token COMPARISON_OP quoted_string
+
+status_query: status_token COMPARISON_OP quoted_string
+
+id_token: "id"i
+
+name_token: "name"i
+
+classname_token: "classname"i
+
+testsuite_token: "testsuite"i
+
+file_token: "file"i
+
+status_token: "status"i
+
+COMPARISON_OP: "=" | "!="
+
+and_op: "and"i
+or_op: "or"i
+
+quoted_string: ESCAPED_STRING
+
+ESCAPED_STRING: /\"[^"]*\"/
+
+%import common.WS
+%ignore WS

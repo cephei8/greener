@@ -1,0 +1,10 @@
+default: serve
+
+serve:
+  mkdocs serve
+
+build:
+  mkdocs build --site-dir out
+
+host:
+  python3 -m http.server -d out

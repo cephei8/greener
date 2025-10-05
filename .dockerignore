@@ -1,0 +1,11 @@
+/server/.claude
+/server/.pytest_cache
+/server/.venv
+/server/.vscode
+/server/.tokeignore
+/server/tests
+/server/dev.sqlite
+/server/poetry.lock
+/server/poetry.toml
+/server/pyproject.toml
+/server/pytest.ini

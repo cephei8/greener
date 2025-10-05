@@ -1,0 +1,63 @@
+[project]
+name = "greener-server"
+version = "0.0.1"
+description = "Greener server"
+authors = [
+    {name = "cephei8"}
+]
+requires-python = ">=3.13,<4.0"
+
+[tool.poetry]
+packages = [{include = "app"}, {include = "alembic"}]
+
+[tool.poetry.dependencies]
+litestar = {extras = ["standard", "jwt", "sqlalchemy"], version = "^2.18.0"}
+alembic = "^1.16.5"
+advanced-alchemy = "^1.6.2"
+aiosqlite = "^0.21.0"
+lark = "^1.2.2"
+pydantic = "^2.11.10"
+asyncpg = "^0.30.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.4.1"
+coverage = "^7.10.6"
+pytest-asyncio = "^1.1.0"
+pytest-cov = "^7.0.0"
+testcontainers = "^4.13.1"
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.1.0"
+isort = "^6.0.1"
+pyflakes = "^3.4.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "tests/*",
+    "alembic/*",
+    ".venv/*"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "@(abc\\.)?abstractmethod",
+    "assert_never\\(",
+]
+show_missing = true
+precision = 2
+
+[tool.coverage.html]
+directory = "htmlcov"
