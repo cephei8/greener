@@ -20,6 +20,6 @@ COPY ./server /app
 RUN pip install --no-cache-dir -r pip-reqs.txt
 
 COPY --from=build_blazor /app/out/wwwroot /app/blazor
-COPY ./server/unit.json /docker-entrypoint.d/
+COPY ./unit.json /docker-entrypoint.d/
 
 EXPOSE 5096
