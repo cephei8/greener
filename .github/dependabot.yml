@@ -20,3 +20,8 @@ updates:
     directory: "/util/greener-admin-cli"
     schedule:
       interval: "weekly"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
