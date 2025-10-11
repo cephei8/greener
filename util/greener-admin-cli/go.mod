@@ -12,7 +12,7 @@ require (
 	github.com/uptrace/bun/driver/pgdriver v1.2.15
 	github.com/uptrace/bun/driver/sqliteshim v1.2.15
 	github.com/urfave/cli/v3 v3.4.1
-	golang.org/x/crypto v0.42.0
+	golang.org/x/crypto v0.43.0
 )
 
 require (
@@ -31,7 +31,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.37.0 // indirect
 	golang.org/x/exp v0.0.0-20250711185948-6ae5c78190dc // indirect
 	golang.org/x/mod v0.26.0 // indirect
-	golang.org/x/sys v0.36.0 // indirect
+	golang.org/x/sys v0.37.0 // indirect
 	mellium.im/sasl v0.3.2 // indirect
 	modernc.org/libc v1.66.3 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
