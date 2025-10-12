@@ -35,11 +35,17 @@ jobs:
       - run: poetry run pytest -v --postgres .
         working-directory: server
 
+      - name: Prepare image tag
+        run: |
+          GREENER_IMAGE_TAG="${{ inputs.release_tag }}"
+          GREENER_IMAGE_TAG="$(echo "$GREENER_IMAGE_TAG" | cut -c2-)"
+          echo "GREENER_IMAGE_TAG=$GREENER_IMAGE_TAG" >> $GITHUB_ENV
+
       - uses: docker/setup-buildx-action@v3
       - uses: docker/build-push-action@v6
         with:
           push: false
-          tags: cephei8/greener:${{ inputs.release_tag[1:] }}
+          tags: cephei8/greener:${{ env.GREENER_IMAGE_TAG }}
 
       - name: Create release
         run: |
