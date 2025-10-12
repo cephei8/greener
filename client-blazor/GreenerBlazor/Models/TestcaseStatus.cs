@@ -5,8 +5,8 @@ namespace GreenerBlazor.Models;
 [JsonConverter(typeof(JsonStringEnumConverter<TestcaseStatus>))]
 public enum TestcaseStatus
 {
-    Pass,
-    Fail,
     Error,
+    Fail,
+    Pass,
     Skip,
 }
