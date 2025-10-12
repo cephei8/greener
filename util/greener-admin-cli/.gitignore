@@ -1,1 +1,2 @@
-/greener-admin-cli
+/target
+Cargo.lock

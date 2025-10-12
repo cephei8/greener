@@ -16,8 +16,8 @@ updates:
     directory: "/server"
     schedule:
       interval: "weekly"
-  - package-ecosystem: "gomod"
-    directory: "/util/greener-admin-cli"
+  - package-ecosystem: "cargo"
+    directory: "/greener-admin-cli"
     schedule:
       interval: "weekly"
 
