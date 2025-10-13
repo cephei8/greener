@@ -77,6 +77,7 @@ def test_app(db_conn):
             session_config=AsyncSessionConfig(expire_on_commit=False),
             create_all=False,
         ),
+        token_secret="abcd",
     )
     app.debug = True
     return app

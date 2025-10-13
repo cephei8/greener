@@ -18,6 +18,11 @@ DATABASE_URL = os.getenv("GREENER_DATABASE_URL")
 if not DATABASE_URL:
     raise ImproperlyConfiguredException("GREENER_DATABASE_URL is not set")
 
+TOKEN_SECRET = os.getenv("GREENER_JWT_SECRET")
+if not TOKEN_SECRET:
+    raise ImproperlyConfiguredException("GREENER_JWT_SECRET is not set")
+
+
 alchemy_config = SQLAlchemyAsyncConfig(
     connection_string=DATABASE_URL,
     before_send_handler="autocommit",
@@ -28,4 +33,4 @@ alchemy_config = SQLAlchemyAsyncConfig(
     create_all=True,
 )
 
-app = make_app(alchemy_config)
+app = make_app(alchemy_config, TOKEN_SECRET)
