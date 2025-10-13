@@ -67,12 +67,10 @@ def pydantic_validation_exception_handler(
     )
 
 
-def make_app(alchemy_config: SQLAlchemyAsyncConfig) -> Litestar:
+def make_app(alchemy_config: SQLAlchemyAsyncConfig, token_secret: str) -> Litestar:  
     jwt_auth = JWTAuth[User](
         retrieve_user_handler=retrieve_user_handler,
-        token_secret=environ.get(
-            "GREENER_JWT_SECRET", "HUaV9XPsdhNzll5a1SPkkCoIg9rkQYIm"
-        ),
+        token_secret=token_secret,
         default_token_expiration=timedelta(hours=1),
         exclude=[
             "/api/v1/auth/login",
