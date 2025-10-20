@@ -13,7 +13,7 @@ packages = [{include = "app"}, {include = "alembic"}]
 [tool.poetry.dependencies]
 litestar = {extras = ["standard", "jwt", "sqlalchemy"], version = "^2.18.0"}
 alembic = "^1.17.0"
-advanced-alchemy = "^1.6.2"
+advanced-alchemy = "^1.7.0"
 aiosqlite = "^0.21.0"
 lark = "^1.2.2"
 pydantic = "^2.12.0"
