@@ -35,13 +35,11 @@ theme:
     - navigation.expand
     - content.code.copy
     - content.tabs.link
-    - navigation.tabs
     - navigation.instant
     - navigation.instant.progress
     - navigation.top
     - navigation.tracking
     - toc.follow
-    - toc.integrate
 markdown_extensions:
   - admonition
   - pymdownx.details
