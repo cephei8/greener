@@ -79,10 +79,16 @@ class Label(base.BigIntAuditBase):
     key: Mapped[str]
     value: Mapped[str | None]
 
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
-    user: Mapped[User] = relationship(lazy="noload")
-    session_id: Mapped[UUID] = mapped_column(ForeignKey("sessions.id"))
-    session: Mapped[Session_] = relationship(lazy="noload")
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("users.id"), info=dto_field(Mark.PRIVATE)
+    )
+    user: Mapped[User] = relationship(lazy="noload", info=dto_field(Mark.PRIVATE))
+    session_id: Mapped[UUID] = mapped_column(
+        ForeignKey("sessions.id", info=dto_field(Mark.PRIVATE))
+    )
+    session: Mapped[Session_] = relationship(
+        lazy="noload", info=dto_field(Mark.PRIVATE)
+    )
 
 
 class TestcaseStatus(enum.IntEnum):
@@ -152,7 +158,7 @@ class TestcaseReadDTO(SQLAlchemyDTO[Testcase]):
 
 class LabelReadDTO(SQLAlchemyDTO[Label]):
     config = SQLAlchemyDTOConfig(
-        exclude={"id", "updated_at", "user", "session"},
+        exclude={"id", "updated_at"},
         forbid_unknown_fields=True,
         rename_strategy="camel",
     )
