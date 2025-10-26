@@ -18,6 +18,9 @@ It is easy to configure and self-host, integrates with you favorite test framewo
 - **Real-time**  
   Gain insights into long-running test pipelines in real-time, view results for the tests as they complete.
 
+## UI
+![Greener UI](assets/greener_ui.png)
+
 ## Use Cases
 - **Get to the failed tests and the error output fast**  
   Output from a test framework is usually a lot of text, which can be hard to navigate and keep track of.  
@@ -32,3 +35,4 @@ It is easy to configure and self-host, integrates with you favorite test framewo
 - **Monitor long-running test pipelines in real-time**  
   Your testing process may be slow, and it can be beneficial to be able to view results before all the tests complete.
   For instance, you may want to cancel the test session early in case of test failures.
+
