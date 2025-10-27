@@ -4,8 +4,9 @@ import enum
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Annotated, Any
-from uuid import UUID
+from uuid import UUID, uuid4
 
+from advanced_alchemy.mixins import AuditColumns
 from litestar.dto import DataclassDTO, Mark, dto_field
 from litestar.dto.config import DTOConfig
 from litestar.pagination import OffsetPagination
@@ -18,10 +19,19 @@ from litestar.plugins.sqlalchemy import (
 from pydantic import Field
 from pydantic.dataclasses import dataclass as pydantic_dataclass
 from sqlalchemy import ForeignKey, Integer, MetaData
+from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
-class User(base.UUIDAuditBase):
+class UUIDAuditBase(
+    base.CommonTableAttributes, AuditColumns, base.AdvancedDeclarativeBase, AsyncAttrs
+):
+    __abstract__ = True
+
+    id: Mapped[UUID] = mapped_column(default=uuid4, primary_key=True)
+
+
+class User(UUIDAuditBase):
     __tablename__ = "users"
 
     username: Mapped[str] = mapped_column(unique=True, info=dto_field(Mark.PRIVATE))
@@ -29,7 +39,7 @@ class User(base.UUIDAuditBase):
     password_hash: Mapped[bytes] = mapped_column(info=dto_field(Mark.PRIVATE))
 
 
-class APIKey(base.UUIDAuditBase):
+class APIKey(UUIDAuditBase):
     __tablename__ = "apikeys"
 
     description: Mapped[str | None]
@@ -100,7 +110,7 @@ class TestcaseStatus(enum.IntEnum):
     SKIP = 3
 
 
-class Testcase(base.UUIDAuditBase):
+class Testcase(UUIDAuditBase):
     __tablename__ = "testcases"
     __test__ = False
 
@@ -122,7 +132,7 @@ class Testcase(base.UUIDAuditBase):
     )
 
 
-class Session_(base.UUIDAuditBase):
+class Session_(UUIDAuditBase):
     __tablename__ = "sessions"
 
     description: Mapped[str | None] = mapped_column(info=dto_field(Mark.READ_ONLY))

@@ -6,14 +6,15 @@ services:
     ports:
       - "5096:5096"
     environment:
-      GREENER_DATABASE_URL: postgresql+asyncpg://postgres:qwerty@db:5432/postgres?ssl=disable
+      GREENER_DATABASE_URL: postgresql://postgres:qwerty@db:5432/postgres?ssl=disable
+      GREENER_DATABASE_DRIVER: asyncpg
       GREENER_JWT_SECRET: abcdefg1234567
     depends_on:
       db:
         condition: service_healthy
 
   db:
-    image: postgres:latest
+    image: postgres:18
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -22,7 +23,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 2s
