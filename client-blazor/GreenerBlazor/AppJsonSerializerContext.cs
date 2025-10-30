@@ -21,7 +21,7 @@ namespace GreenerBlazor
     [JsonSerializable(typeof(CreateApiKeyRequestDto))]
     [JsonSerializable(typeof(CreateApiKeyResponseDto))]
     [JsonSerializable(typeof(QueryValidationResult))]
-    [JsonSerializable(typeof(PaginatedResponseDto<TestcaseDto>))]
+    [JsonSerializable(typeof(TestcasePaginatedResponseDto))]
     [JsonSerializable(typeof(LabelDto))]
     [JsonSerializable(typeof(PaginatedResponseDto<LabelDto>))]
     [JsonSerializable(typeof(PaginatedResponseDto<SessionDto>))]

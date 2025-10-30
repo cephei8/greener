@@ -261,6 +261,11 @@ class TestcasesRequestDTO(DataclassDTO[TestcasesRequest]):
 
 
 @dataclass
+class TestcaseOffsetPagination(OffsetPagination[Testcase]):
+    aggregatedStatus: TestcaseStatus | None
+
+
+@dataclass
 class QueryValidationResult:
     is_grouping: bool
 

@@ -21,6 +21,7 @@ from app.models import (
     Label,
     Session_,
     Testcase,
+    TestcaseOffsetPagination,
     TestcaseReadDTO,
     TestcaseRepository,
     User,
@@ -39,7 +40,6 @@ class TestcaseController(Controller):
         self,
         request: Request[User, Token, Any],
         db_session: AsyncSession,
-        testcase_repo: TestcaseRepository,
         offset: int = 0,
         limit: int = 100,
         query_str: str | None = Parameter(query="queryStr", default=None),
@@ -47,20 +47,7 @@ class TestcaseController(Controller):
         end_date: datetime | None = Parameter(query="endDate", default=None),
         group: str | None = None,
     ) -> OffsetPagination[Testcase]:
-        if not any([query_str, start_date, end_date, group]):
-            items, total = await testcase_repo.list_and_count(
-                LimitOffset(limit=limit, offset=offset),
-                OrderBy(field_name="created_at", sort_order="desc"),
-                user_id=request.user.id,
-            )
-            return OffsetPagination[Testcase](
-                items=items,
-                total=total,
-                limit=limit,
-                offset=offset,
-            )
-
-        query = select(Testcase).where(Testcase.user_id == request.user.id)
+        cte_query = select(Testcase).where(Testcase.user_id == request.user.id)
 
         query_ast = None
         if query_str:
@@ -77,38 +64,60 @@ class TestcaseController(Controller):
                 query_ast.main_query if hasattr(query_ast, "main_query") else query_ast
             )
             if where_cond is not None:
-                query = query.where(where_cond)
+                cte_query = cte_query.where(where_cond)
 
         if start_date is not None:
-            query = query.where(Testcase.created_at >= start_date)
+            cte_query = cte_query.where(Testcase.created_at >= start_date)
         if end_date is not None:
-            query = query.where(Testcase.created_at < end_date)
+            cte_query = cte_query.where(Testcase.created_at < end_date)
 
         if group:
             try:
                 group_decoded = unquote(group)
                 parsed_group = json.loads(group_decoded)
                 group_keys, group_values = self._validate_group_format(parsed_group)
-                query = self._apply_group_filter(query, group_keys, group_values)
+                cte_query = self._apply_group_filter(
+                    cte_query, group_keys, group_values
+                )
             except (json.JSONDecodeError, ValueError) as e:
                 raise ValidationException(f"Invalid group identifier: {e}") from e
 
-        query = query.order_by(Testcase.created_at.desc())
+        cte_query = cte_query.order_by(Testcase.created_at.desc())
+        cte = cte_query.cte("cte")
+        query = (
+            select(
+                cte,
+                func.count(1).over().label("total_count"),
+                func.min(cte.c.status).over().label("aggregated_status"),
+            )
+            .select_from(cte)
+            .offset(offset)
+            .limit(limit)
+        )
 
-        count_query = select(func.count()).select_from(query.subquery())
-        total_result = await db_session.execute(count_query)
-        total = total_result.scalar()
+        aggregated_status = None
+        total_count = None
+        items = []
 
-        query = query.offset(offset).limit(limit)
+        testcase_cols = Testcase.__table__.columns.keys()
 
         result = await db_session.execute(query)
-        items = list(result.scalars().all())
+        for row in result:
+            if aggregated_status is None:
+                aggregated_status = row.aggregated_status
+            if total_count is None:
+                total_count = row.total_count
+            mapping = row._mapping
+            testcase_data = {k: mapping[k] for k in testcase_cols if k in mapping}
+            item = Testcase(**testcase_data)
+            items.append(item)
 
-        return OffsetPagination[Testcase](
+        return TestcaseOffsetPagination(
             items=items,
-            total=total or 0,
+            total=total_count or 0,
             limit=limit,
             offset=offset,
+            aggregatedStatus=aggregated_status,
         )
 
     @get("/{id:uuid}", summary="Get testcase")
