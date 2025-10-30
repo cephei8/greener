@@ -38,7 +38,7 @@ jobs:
       - name: Prepare image tag
         run: |
           GREENER_IMAGE_TAG="${{ inputs.release_tag }}"
-          GREENER_IMAGE_TAG="$(echo "$GREENER_IMAGE_TAG" | cut -c2-)"
+          GREENER_IMAGE_TAG="$(echo "$GREENER_IMAGE_TAG" | cut -c2-)-full"
           echo "GREENER_IMAGE_TAG=$GREENER_IMAGE_TAG" >> $GITHUB_ENV
 
       - uses: docker/login-action@v3
