@@ -5,14 +5,14 @@ namespace GreenerBlazor.Helpers;
 
 public class TestcaseRestItemsProviderAdapter(
     TestcaseService testcaseApiService,
-    Func<PaginatedResponseDto<TestcaseDto>, Task> onResponseFetched,
+    Func<TestcasePaginatedResponseDto, Task> onResponseFetched,
     string? query,
     DateTime? startDate,
     DateTime? endDate,
     string? group
-) : IItemsProviderAdapter<TestcaseRow, TestcaseListRequest, PaginatedResponseDto<TestcaseDto>>
+) : IItemsProviderAdapter<TestcaseRow, TestcaseListRequest, TestcasePaginatedResponseDto>
 {
-    public Func<PaginatedResponseDto<TestcaseDto>, Task> OnResponseFetched => onResponseFetched;
+    public Func<TestcasePaginatedResponseDto, Task> OnResponseFetched => onResponseFetched;
 
     public string GetToken(TestcaseRow row) => row.Id;
 
@@ -20,7 +20,7 @@ public class TestcaseRestItemsProviderAdapter(
 
     public void SetLimit(TestcaseListRequest request, int limit) => request.Limit = limit;
 
-    public async Task<PaginatedResponseDto<TestcaseDto>> MakeRequestAsync(
+    public async Task<TestcasePaginatedResponseDto> MakeRequestAsync(
         TestcaseListRequest request,
         CancellationToken cancellationToken
     )
@@ -36,7 +36,7 @@ public class TestcaseRestItemsProviderAdapter(
         );
     }
 
-    public List<TestcaseRow> GetItems(PaginatedResponseDto<TestcaseDto> response) =>
+    public List<TestcaseRow> GetItems(TestcasePaginatedResponseDto response) =>
         [
             .. response.Items.Select(tc => new TestcaseRow(
                 tc.Id,
@@ -46,7 +46,7 @@ public class TestcaseRestItemsProviderAdapter(
             )),
         ];
 
-    public int GetTotalCount(PaginatedResponseDto<TestcaseDto> response) => response.Total;
+    public int GetTotalCount(TestcasePaginatedResponseDto response) => response.Total;
 }
 
 public class TestcaseListRequest

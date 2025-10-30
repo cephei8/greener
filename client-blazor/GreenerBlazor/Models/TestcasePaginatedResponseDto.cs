@@ -1,8 +1,8 @@
 namespace GreenerBlazor.Models;
 
-public class PaginatedResponseDto<T>
+public class TestcasePaginatedResponseDto
 {
-    public required List<T> Items { get; set; }
+    public required List<TestcaseDto> Items { get; set; }
     public required int Total { get; set; }
     public required int Limit { get; set; }
     public required int Offset { get; set; }

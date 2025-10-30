@@ -4,7 +4,7 @@ namespace GreenerBlazor.Services;
 
 public class TestcaseService(ApiClient apiClient)
 {
-    public async Task<PaginatedResponseDto<TestcaseDto>> GetTestcasesAsync(
+    public async Task<TestcasePaginatedResponseDto> GetTestcasesAsync(
         int offset,
         int limit,
         string? query,
@@ -29,7 +29,7 @@ public class TestcaseService(ApiClient apiClient)
             queryParams.Add($"group={Uri.EscapeDataString(group)}");
 
         var endpoint = $"/api/v1/testcases?{string.Join("&", queryParams)}";
-        return await apiClient.GetAsync<PaginatedResponseDto<TestcaseDto>>(
+        return await apiClient.GetAsync<TestcasePaginatedResponseDto>(
             endpoint,
             cancellationToken
         );

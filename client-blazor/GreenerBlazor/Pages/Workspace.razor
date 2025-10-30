@@ -221,10 +221,10 @@
         return Task.CompletedTask;
     }
 
-    private Task OnTestcasesResponseFetched(PaginatedResponseDto<TestcaseDto> response)
+    private Task OnTestcasesResponseFetched(TestcasePaginatedResponseDto response)
     {
         // Take any status since they are duplicated for each item
-        _aggregatedTestcasesStatus = response.Items.FirstOrDefault()?.Status;
+        _aggregatedTestcasesStatus = response.AggregatedStatus;
 
         StateHasChanged();
         return Task.CompletedTask;
@@ -419,7 +419,7 @@
 
     GridItemsProvider<GroupRow> _groupGridItemsProvider = null!;
 
-    ItemsProvider<TestcaseRow, TestcaseListRequest, PaginatedResponseDto<TestcaseDto>> _testcaseItemsProvider = null!;
+    ItemsProvider<TestcaseRow, TestcaseListRequest, TestcasePaginatedResponseDto> _testcaseItemsProvider = null!;
 
     GridItemsProvider<TestcaseRow> _testcaseGridItemsProvider = null!;
 
@@ -448,7 +448,7 @@
     private ItemsProvider<
             TestcaseRow,
             TestcaseListRequest,
-            PaginatedResponseDto<TestcaseDto>>
+            TestcasePaginatedResponseDto>
         CreateTestcaseItemsProvider(GroupRow? groupRow, string? query, DateTime? startDate, DateTime? endDate)
     {
         string? group = groupRow?.CreateGroupParameterJson();
@@ -459,7 +459,7 @@
             startDate,
             endDate,
             group);
-        return new ItemsProvider<TestcaseRow, TestcaseListRequest, PaginatedResponseDto<TestcaseDto>>(ExceptionService, adapter);
+        return new ItemsProvider<TestcaseRow, TestcaseListRequest, TestcasePaginatedResponseDto>(ExceptionService, adapter);
     }
 
     record EntityProperty(string Property, string Value);
