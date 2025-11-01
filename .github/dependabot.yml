@@ -9,7 +9,7 @@ updates:
     schedule:
       interval: "weekly"
   - package-ecosystem: "dotnet-sdk"
-    directory: "/client-blazor/GreenerBlazor"
+    directory: "/client-blazor"
     schedule:
       interval: "weekly"
   - package-ecosystem: "pip"
@@ -17,7 +17,11 @@ updates:
     schedule:
       interval: "weekly"
   - package-ecosystem: "cargo"
-    directory: "/greener-admin-cli"
+    directory: "/migration"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "cargo"
+    directory: "/util/greener-admin-cli"
     schedule:
       interval: "weekly"
 
