@@ -12,7 +12,7 @@ RUN dotnet build --no-restore -c Release
 RUN dotnet publish GreenerBlazor --no-restore -c Release -o out
 
 ############################################################
-FROM rust:1.90 AS build_migration
+FROM rust:1.91 AS build_migration
 
 WORKDIR /app
 COPY ./migration /app
