@@ -15,11 +15,22 @@ DATABASE_URL = os.getenv("GREENER_DATABASE_URL")
 if not DATABASE_URL:
     raise ImproperlyConfiguredException("GREENER_DATABASE_URL is not set")
 
-DATABASE_DRIVER = os.getenv("GREENER_DATABASE_DRIVER")
-if DATABASE_DRIVER:
-    url = make_url(DATABASE_URL)
-    url = url.set(drivername=f"{url.drivername}+{DATABASE_DRIVER}")
-    DATABASE_URL = url.render_as_string(hide_password=False)
+url = make_url(DATABASE_URL)
+if not url.database:
+    raise ImproperlyConfiguredException(
+        "GREENER_DATABASE_URL must have database part specified"
+    )
+
+driver_mapping = {"sqlite": "aiosqlite", "postgres": "asyncpg"}
+driver = driver_mapping.get(url.database)
+if not driver:
+    raise ImproperlyConfiguredException(
+        f"Database is not supported, required {list(driver_mapping.keys())}, got '{url.database}'"
+    )
+
+DATABASE_URL = url.set(drivername=f"{url.drivername}+{driver}").render_as_string(
+    hide_password=False
+)
 
 TOKEN_SECRET = os.getenv("GREENER_JWT_SECRET")
 if not TOKEN_SECRET:

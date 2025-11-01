@@ -7,7 +7,6 @@ services:
       - "5096:5096"
     environment:
       GREENER_DATABASE_URL: postgresql://postgres:qwerty@db:5432/postgres?ssl=disable
-      GREENER_DATABASE_DRIVER: asyncpg
       GREENER_JWT_SECRET: abcdefg1234567
     depends_on:
       db:

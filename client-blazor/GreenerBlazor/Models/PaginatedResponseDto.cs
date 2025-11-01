@@ -6,5 +6,4 @@ public class PaginatedResponseDto<T>
     public required int Total { get; set; }
     public required int Limit { get; set; }
     public required int Offset { get; set; }
-    public required TestcaseStatus AggregatedStatus { get; set; }
 }
