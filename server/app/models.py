@@ -18,7 +18,7 @@ from litestar.plugins.sqlalchemy import (
 )
 from pydantic import Field
 from pydantic.dataclasses import dataclass as pydantic_dataclass
-from sqlalchemy import ForeignKey, Integer, MetaData
+from sqlalchemy import ForeignKey, Integer, MetaData, String, Text
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -34,7 +34,9 @@ class UUIDAuditBase(
 class User(UUIDAuditBase):
     __tablename__ = "users"
 
-    username: Mapped[str] = mapped_column(unique=True, info=dto_field(Mark.PRIVATE))
+    username: Mapped[str] = mapped_column(
+        String(128), unique=True, info=dto_field(Mark.PRIVATE)
+    )
     password_salt: Mapped[bytes] = mapped_column(info=dto_field(Mark.PRIVATE))
     password_hash: Mapped[bytes] = mapped_column(info=dto_field(Mark.PRIVATE))
 
@@ -42,7 +44,7 @@ class User(UUIDAuditBase):
 class APIKey(UUIDAuditBase):
     __tablename__ = "apikeys"
 
-    description: Mapped[str | None]
+    description: Mapped[str | None] = mapped_column(Text)
     secret_salt: Mapped[bytes] = mapped_column(info=dto_field(Mark.PRIVATE))
     secret_hash: Mapped[bytes] = mapped_column(info=dto_field(Mark.PRIVATE))
 
@@ -86,8 +88,8 @@ class APIKeyUnencryptedReadDTO(DataclassDTO[APIKeyUnencrypted]):
 class Label(base.BigIntAuditBase):
     __tablename__ = "labels"
 
-    key: Mapped[str]
-    value: Mapped[str | None]
+    key: Mapped[str] = mapped_column(Text)
+    value: Mapped[str | None] = mapped_column(Text)
 
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("users.id"), info=dto_field(Mark.PRIVATE)
@@ -115,11 +117,11 @@ class Testcase(UUIDAuditBase):
     __test__ = False
 
     status: Mapped[TestcaseStatus] = mapped_column(Integer)
-    name: Mapped[str]
-    classname: Mapped[str | None]
-    file: Mapped[str | None]
-    testsuite: Mapped[str | None]
-    output: Mapped[str | None]
+    name: Mapped[str] = mapped_column(Text)
+    classname: Mapped[str | None] = mapped_column(Text)
+    file: Mapped[str | None] = mapped_column(Text)
+    testsuite: Mapped[str | None] = mapped_column(Text)
+    output: Mapped[str | None] = mapped_column(Text)
     baggage: Mapped[dict | None]
 
     user_id: Mapped[UUID] = mapped_column(
@@ -135,7 +137,9 @@ class Testcase(UUIDAuditBase):
 class Session_(UUIDAuditBase):
     __tablename__ = "sessions"
 
-    description: Mapped[str | None] = mapped_column(info=dto_field(Mark.READ_ONLY))
+    description: Mapped[str | None] = mapped_column(
+        Text, info=dto_field(Mark.READ_ONLY)
+    )
     baggage: Mapped[dict | None] = mapped_column(info=dto_field(Mark.READ_ONLY))
 
     labels: Mapped[list[Label]] = relationship(

@@ -11,9 +11,9 @@ impl MigrationTrait for Migration {
                 Table::create()
                     .table(Users::Table)
                     .col(uuid(Users::Id).primary_key())
-                    .col(string(Users::Username))
-                    .col(binary(Users::PasswordSalt))
-                    .col(binary(Users::PasswordHash))
+                    .col(string_len(Users::Username, 128))
+                    .col(binary_len(Users::PasswordSalt, 32))
+                    .col(binary_len(Users::PasswordHash, 32))
                     .col(
                         timestamp_with_time_zone(Users::CreatedAt)
                             .default(Expr::current_timestamp()),
@@ -42,8 +42,8 @@ impl MigrationTrait for Migration {
                     .table(Apikeys::Table)
                     .col(uuid(Apikeys::Id).primary_key())
                     .col(string_null(Apikeys::Description))
-                    .col(binary(Apikeys::SecretSalt))
-                    .col(binary(Apikeys::SecretHash))
+                    .col(binary_len(Apikeys::SecretSalt, 32))
+                    .col(binary_len(Apikeys::SecretHash, 32))
                     .col(
                         timestamp_with_time_zone(Apikeys::CreatedAt)
                             .default(Expr::current_timestamp()),

@@ -16,6 +16,10 @@ updates:
     directory: "/server"
     schedule:
       interval: "weekly"
+  - package-ecosystem: "pip"
+    directory: "/tests_e2e"
+    schedule:
+      interval: "weekly"
   - package-ecosystem: "cargo"
     directory: "/migration"
     schedule:
