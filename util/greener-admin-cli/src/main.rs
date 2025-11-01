@@ -66,7 +66,7 @@ async fn init_db(url: &str, db_type: &str) -> Result<DatabaseConnection, Box<dyn
 
 fn hash_password(password: &str) -> Result<(Vec<u8>, Vec<u8>), Box<dyn Error>> {
     let mut salt = vec![0u8; 32];
-    rand::thread_rng().fill_bytes(&mut salt);
+    rand::rng().fill_bytes(&mut salt);
 
     let mut hash = vec![0u8; 32];
     pbkdf2_hmac::<Sha256>(password.as_bytes(), &salt, 100_000, &mut hash);

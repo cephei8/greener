@@ -1,6 +1,7 @@
 import contextlib
 
 import pytest
+import testcontainers.mysql
 import testcontainers.postgres
 from advanced_alchemy.extensions.litestar import (
     AsyncSessionConfig,
@@ -32,18 +33,24 @@ def pytest_addoption(parser):
     parser.addoption(
         "--postgres", action="store_true", default=False, help="run postgres tests"
     )
+    parser.addoption(
+        "--mysql", action="store_true", default=False, help="run mysql tests"
+    )
 
 
 def pytest_generate_tests(metafunc):
     if "db_conn" in metafunc.fixturenames:
         sqlite = metafunc.config.getoption("sqlite")
         postgres = metafunc.config.getoption("--postgres")
+        mysql = metafunc.config.getoption("--mysql")
 
         params = []
         if sqlite:
             params.append("db_sqlite")
         if postgres:
             params.append("db_postgres")
+        if mysql:
+            params.append("db_mysql")
 
         metafunc.parametrize("db_conn", params, indirect=True)
 
@@ -61,6 +68,17 @@ def db_postgres():
             f"{postgres.username}:{postgres.password}@"
             f"{postgres.get_container_host_ip()}:{postgres.get_exposed_port(5432)}/"
             f"{postgres.dbname}"
+        )
+
+
+@pytest.fixture
+def db_mysql():
+    with testcontainers.mysql.MySqlContainer("mysql:latest") as mysql:
+        yield (
+            "mysql+asyncmy://"
+            f"{mysql.username}:{mysql.password}@"
+            f"{mysql.get_container_host_ip()}:{mysql.get_exposed_port(3306)}/"
+            f"{mysql.dbname}"
         )
 
 

@@ -24,6 +24,7 @@ from app.controllers import (
     GroupController,
     IngressController,
     LabelController,
+    ReadyController,
     SessionController,
     TestcaseController,
     retrieve_user_handler,
@@ -77,6 +78,7 @@ def make_app(alchemy_config: SQLAlchemyAsyncConfig, token_secret: str) -> Litest
             "/api/v1/auth/refresh",
             "/api/v1/ingress/sessions",
             "/api/v1/ingress/testcases",
+            "/api/v1/ready",
         ],
     )
 
@@ -88,6 +90,7 @@ def make_app(alchemy_config: SQLAlchemyAsyncConfig, token_secret: str) -> Litest
         route_handlers=[
             AuthController,
             APIKeyController,
+            ReadyController,
             SessionController,
             TestcaseController,
             GroupController,

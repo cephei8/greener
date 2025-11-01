@@ -21,11 +21,16 @@ if not url.database:
         "GREENER_DATABASE_URL must have database part specified"
     )
 
-driver_mapping = {"sqlite": "aiosqlite", "postgres": "asyncpg"}
-driver = driver_mapping.get(url.database)
+driver_mapping = {
+    "sqlite": "aiosqlite",
+    "postgresql": "asyncpg",
+    "postgres": "asyncpg",
+    "mysql": "asyncmy",
+}
+driver = driver_mapping.get(url.drivername)
 if not driver:
     raise ImproperlyConfiguredException(
-        f"Database is not supported, required {list(driver_mapping.keys())}, got '{url.database}'"
+        f"Database is not supported, required {list(driver_mapping.keys())}, got '{url.drivername}'"
     )
 
 DATABASE_URL = url.set(drivername=f"{url.drivername}+{driver}").render_as_string(

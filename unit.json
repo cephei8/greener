@@ -1,26 +1,26 @@
 {
-  "listeners": {
-    "*:5096": {
-      "pass": "routes"
-    }
-  },
-  "applications": {
-    "greener": {
-      "type": "python 3",
-      "working_directory": "/app",
-      "path": "/app",
-      "module": "app.app",
-      "callable": "app"
-    }
-  },
-  "routes": [
-    {
-      "match": {"uri": "/api/v1/*"},
-      "action": {"pass": "applications/greener"}
+    "listeners": {
+        "*:5096": {
+            "pass": "routes"
+        }
     },
-    {
-      "match": {"uri": "/*"},
-      "action": {"share": "/app/blazor$uri"}
-    }
-  ]
+    "applications": {
+        "greener": {
+            "type": "python 3",
+            "working_directory": "/app",
+            "path": "/app",
+            "module": "app.app",
+            "callable": "app"
+        }
+    },
+    "routes": [
+        {
+            "match": { "uri": "/api/v1/*" },
+            "action": { "pass": "applications/greener" }
+        },
+        {
+            "match": { "uri": "/*" },
+            "action": { "share": "/app/blazor$uri" }
+        }
+    ]
 }
