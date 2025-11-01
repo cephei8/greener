@@ -1,9 +1,9 @@
 # Configuration
 ## Platform Configuration
-| Environment Variable | Is Required? | Description  | Value Example                                           |
-|:---------------------|:-------------|:-------------|:--------------------------------------------------------|
-| GREENER_DATABASE_URL | *Yes*        | Database URL | `postgresql+asyncpg://postgres:qwerty@db:5432/postgres` |
-| GREENER_JWT_SECRET   | *Yes*        | JWT secret   | `abcdefg1234567`                                        |
+| Environment Variable    | Is Required? | Description                | Value Example                                           |
+|:------------------------|:-------------|:---------------------------|:--------------------------------------------------------|
+| GREENER_DATABASE_URL    | *Yes*        | Database URL               | `postgresql+asyncpg://postgres:qwerty@db:5432/postgres` |
+| GREENER_JWT_SECRET      | *Yes*        | JWT secret                 | `abcdefg1234567`                                        |
 
 ## Plugins Configuration
 
