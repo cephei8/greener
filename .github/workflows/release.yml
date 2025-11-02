@@ -9,16 +9,12 @@ on:
         type: string
 
 jobs:
-  release_create:
-    name: (Release) Create release
+  release_test:
+    name: (Release) Test release
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
-    environment: Docker Hub
-    permissions:
-      id-token: write
-      contents: write
 
     steps:
       - uses: actions/checkout@v5
@@ -41,6 +37,21 @@ jobs:
           .venv/bin/python -m pip install -r requirements.txt
           .venv/bin/python -m pytest -v --skip-sqlite
         working-directory: tests_e2e
+
+  release_create:
+    name: (Release) Create release
+    needs: release_test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    environment: Docker Hub
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v5
 
       - name: Prepare image tag
         run: |
