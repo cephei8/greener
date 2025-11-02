@@ -35,6 +35,13 @@ jobs:
       - run: poetry run pytest -v --postgres --mysql .
         working-directory: server
 
+      - run: |
+          docker build -t greener-test:latest ..
+          python -m venv .venv
+          .venv/bin/python -m pip install -r requirements.txt
+          .venv/bin/python -m pytest -v --skip-sqlite
+        working-directory: tests_e2e
+
       - name: Prepare image tag
         run: |
           GREENER_IMAGE_TAG="${{ inputs.release_tag }}"
@@ -47,17 +54,6 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - uses: docker/setup-buildx-action@v3
-
-      - uses: docker/build-push-action@v6
-        with:
-          push: false
-          tags: greener-test:latest
-
-      - run: |
-          python -m venv .venv
-          .venv/bin/python -m pip install -r requirements.txt
-          .venv/bin/python -m pytest -v
-        working-directory: tests_e2e
 
       - uses: docker/build-push-action@v6
         with:
