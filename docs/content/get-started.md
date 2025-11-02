@@ -1,7 +1,7 @@
 # Get Started
 
 ## Platform setup
-Pull and run the Docker image [cephei8/greener](https://hub.docker.com/repository/docker/cephei8/greener/general).
+Pull and run the Docker image [cephei8/greener](https://hub.docker.com/r/cephei8/greener).
 
 The following environment variables must be specified:
 
