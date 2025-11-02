@@ -1,3 +1,4 @@
+import shutil
 import sqlite3
 import subprocess
 import time
@@ -10,7 +11,27 @@ import testcontainers.postgres
 from testcontainers.core.container import DockerContainer
 from testcontainers.core.network import Network
 
-REPO_ROOT_PATH = Path(__file__).parent.parent
+E2E_TESTS_PATH = Path(__file__).parent
+REPO_ROOT_PATH = E2E_TESTS_PATH.parent
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--skip-sqlite",
+        action="store_true",
+        default=False,
+        help="Skip SQLite tests",
+    )
+
+
+def pytest_generate_tests(metafunc):
+    if "db_conn" in metafunc.fixturenames:
+        db_params = ["db_sqlite", "db_postgres", "db_mysql"]
+
+        if metafunc.config.getoption("--skip-sqlite"):
+            db_params = [p for p in db_params if p != "db_sqlite"]
+
+        metafunc.parametrize("db_conn", db_params, indirect=True)
 
 
 @pytest.fixture
@@ -93,13 +114,7 @@ def db_mysql(network):
         }
 
 
-@pytest.fixture(
-    params=[
-        "db_sqlite",
-        "db_postgres",
-        "db_mysql",
-    ]
-)
+@pytest.fixture
 def db_conn(request):
     return request.getfixturevalue(request.param)
 
