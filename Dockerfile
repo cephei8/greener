@@ -12,12 +12,12 @@ RUN dotnet build --no-restore -c Release
 RUN dotnet publish GreenerBlazor --no-restore -c Release -o out
 
 ############################################################
-FROM rust:1.91 AS build_migration
+FROM golang:1-trixie AS build_migration
 
 WORKDIR /app
 COPY ./migration /app
 
-RUN cargo build --release
+RUN go build -o greener-migration
 
 ############################################################
 FROM unit:1.34.2-python3.13
@@ -28,7 +28,7 @@ COPY ./server /app
 RUN pip install --no-cache-dir -r pip-reqs.txt
 
 COPY --from=build_blazor /app/out/wwwroot /app/blazor
-COPY --from=build_migration /app/target/release/greener-migration /usr/local/bin/
+COPY --from=build_migration /app/greener-migration /usr/local/bin/
 COPY ./scripts/10-migrate.sh /docker-entrypoint.d/
 COPY ./unit.json /docker-entrypoint.d/
 

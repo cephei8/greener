@@ -71,18 +71,18 @@ def db_postgres(network):
             "postgresql://"
             f"{postgres.username}:{postgres.password}@"
             "db:5432/"
-            f"{postgres.dbname}?ssl=disable"
+            f"{postgres.dbname}?sslmode=disable"
         )
 
         host_url = (
             "postgresql://"
             f"{postgres.username}:{postgres.password}@"
             f"{postgres.get_container_host_ip()}:{postgres.get_exposed_port(5432)}/"
-            f"{postgres.dbname}?ssl=disable"
+            f"{postgres.dbname}?sslmode=disable"
         )
 
         yield {
-            "db_type": "postgres",
+            "db_type": "postgresql",
             "network_url": network_url,
             "host_url": host_url,
         }

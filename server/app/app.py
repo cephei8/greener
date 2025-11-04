@@ -23,8 +23,7 @@ if not url.database:
 
 driver_mapping = {
     "sqlite": "aiosqlite",
-    "postgresql": "asyncpg",
-    "postgres": "asyncpg",
+    "postgresql": "psycopg_async",
     "mysql": "asyncmy",
 }
 driver = driver_mapping.get(url.drivername)
