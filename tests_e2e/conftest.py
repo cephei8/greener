@@ -3,8 +3,8 @@ import subprocess
 import time
 from pathlib import Path
 
+import httpx
 import pytest
-import requests
 import testcontainers.mysql
 import testcontainers.postgres
 from testcontainers.core.container import DockerContainer
@@ -126,11 +126,12 @@ def wait_for_ready(url: str, timeout: int = 120, interval: float = 1.0) -> None:
 
     while time.time() - start_time < timeout:
         try:
-            response = requests.get(f"{url}/api/v1/ready", timeout=5)
-            if response.status_code == 200:
-                return
-            last_error = f"HTTP {response.status_code}: {response.text}"
-        except requests.exceptions.RequestException as e:
+            with httpx.Client() as client:
+                response = client.get(f"{url}/api/v1/ready", timeout=5)
+                if response.status_code == 200:
+                    return
+                last_error = f"HTTP {response.status_code}: {response.text}"
+        except httpx.RequestError as e:
             last_error = str(e)
 
         time.sleep(interval)
@@ -200,38 +201,42 @@ def user(server, db_conn, admin_cli_path):
 
 @pytest.fixture
 def auth_tokens(user, server, server_url):
-    response = requests.post(
-        f"{server_url}/api/v1/auth/login",
-        json={
-            "username": user["username"],
-            "password": user["password"],
-        },
-    )
+    time.sleep(2)
 
-    if response.status_code != 201:
-        try:
-            logs = server.get_wrapped_container().logs().decode("utf-8")
-            print(logs)
-        except Exception as log_err:
-            print(f"Could not get logs: {log_err}")
-        response.raise_for_status()
+    with httpx.Client() as client:
+        response = client.post(
+            f"{server_url}/api/v1/auth/login",
+            json={
+                "username": user["username"],
+                "password": user["password"],
+            },
+        )
 
-    data = response.json()
+        if response.status_code != 201:
+            try:
+                logs = server.get_wrapped_container().logs().decode("utf-8")
+                print(logs)
+            except Exception as log_err:
+                print(f"Could not get logs: {log_err}")
+            response.raise_for_status()
 
-    return {
-        "access_token": data["accessToken"],
-        "refresh_token": data["refreshToken"],
-    }
+        data = response.json()
+
+        return {
+            "access_token": data["accessToken"],
+            "refresh_token": data["refreshToken"],
+        }
 
 
 @pytest.fixture
 def api_key(server_url, auth_tokens):
-    response = requests.post(
-        f"{server_url}/api/v1/api-keys",
-        json={"description": "Test API Key"},
-        headers={"Authorization": f"Bearer {auth_tokens['access_token']}"},
-    )
-    response.raise_for_status()
-    data = response.json()
+    with httpx.Client() as client:
+        response = client.post(
+            f"{server_url}/api/v1/api-keys",
+            json={"description": "Test API Key"},
+            headers={"Authorization": f"Bearer {auth_tokens['access_token']}"},
+        )
+        response.raise_for_status()
+        data = response.json()
 
-    return data["key"]
+        return data["key"]
