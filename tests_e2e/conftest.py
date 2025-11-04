@@ -1,4 +1,3 @@
-import shutil
 import sqlite3
 import subprocess
 import time
