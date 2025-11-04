@@ -56,7 +56,6 @@ def db_sqlite(tmp_path):
     conn.close()
 
     yield {
-        "db_type": "sqlite",
         "host_url": host_url,
         "network_url": network_url,
     }
@@ -82,7 +81,6 @@ def db_postgres(network):
         )
 
         yield {
-            "db_type": "postgresql",
             "network_url": network_url,
             "host_url": host_url,
         }
@@ -108,7 +106,6 @@ def db_mysql(network):
         )
 
         yield {
-            "db_type": "mysql",
             "network_url": network_url,
             "host_url": host_url,
         }
@@ -180,13 +177,11 @@ def user(server, db_conn, admin_cli_path):
 
     result = subprocess.run(
         [
-            "cargo",
+            "go",
             "run",
-            "--",
+            ".",
             "--db-url",
             db_conn["host_url"],
-            "--db-type",
-            db_conn["db_type"],
             "create-user",
             "--username",
             username,
