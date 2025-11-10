@@ -22,7 +22,7 @@ psycopg = "^3.2.12"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.4.1"
-coverage = "^7.11.0"
+coverage = "^7.11.3"
 pytest-asyncio = "^1.1.0"
 pytest-cov = "^7.0.0"
 testcontainers = "^4.13.2"
