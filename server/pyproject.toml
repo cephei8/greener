@@ -15,7 +15,7 @@ litestar = {extras = ["standard", "jwt", "sqlalchemy"], version = "^2.18.0"}
 advanced-alchemy = "^1.7.0"
 aiosqlite = "^0.21.0"
 lark = "^1.2.2"
-pydantic = "^2.12.3"
+pydantic = "^2.12.4"
 asyncpg = "^0.30.0"
 asyncmy = "^0.2.9"
 psycopg = "^3.2.12"
