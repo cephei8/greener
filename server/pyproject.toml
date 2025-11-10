@@ -28,7 +28,7 @@ pytest-cov = "^7.0.0"
 testcontainers = "^4.13.2"
 
 [tool.poetry.group.dev.dependencies]
-black = "^25.1.0"
+black = "^25.11.0"
 isort = "^7.0.0"
 pyflakes = "^3.4.0"
 
