@@ -2,6 +2,8 @@
 Greener is a platform for storing and viewing test results.  
 It is easy to configure and self-host, integrates with you favorite test framework (see [Plugins](plugins.md)) and supports a simple query language to let you access the data you need.
 
+![Greener UI](assets/greener_ui.png)
+
 ## Key Features
 - **Simple configuration**  
   Self-host the platform as a single Docker container.  
@@ -15,11 +17,8 @@ It is easy to configure and self-host, integrates with you favorite test framewo
   Write queries to match results with certain properties/labels.  
   Group results by one or more properties/labels.
 
-- **Real-time**  
-  Gain insights into long-running test pipelines in real-time, view results for the tests as they complete.
-
-## UI
-![Greener UI](assets/greener_ui.png)
+- **Add metadata to sessions and results**
+  Add labels and arbitrary JSON for advanced querying (e.g. release version, target platform, OTel trace context)
 
 ## Use Cases
 - **Get to the failed tests and the error output fast**  
