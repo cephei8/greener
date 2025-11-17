@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"database/sql"
+	"database/sql/driver"
 	"fmt"
 	"log"
 	"os"
@@ -13,11 +14,108 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
-	_ "github.com/lib/pq"
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/mysqldialect"
+	"github.com/uptrace/bun/dialect/pgdialect"
+	"github.com/uptrace/bun/dialect/sqlitedialect"
+	"github.com/uptrace/bun/driver/pgdriver"
+	"github.com/uptrace/bun/driver/sqliteshim"
+	"github.com/uptrace/bun/schema"
 	"github.com/urfave/cli/v3"
 	"golang.org/x/crypto/pbkdf2"
 )
+
+type DBType int
+
+const (
+	DBTypePostgres DBType = iota
+	DBTypeMySQL
+	DBTypeSQLite
+)
+
+var dbDialect schema.Dialect
+
+type BinaryUUID uuid.UUID
+
+func (u *BinaryUUID) Scan(value interface{}) error {
+	if value == nil {
+		return fmt.Errorf("cannot scan nil into BinaryUUID")
+	}
+
+	switch dbDialect.(type) {
+	case *pgdialect.Dialect:
+		switch v := value.(type) {
+		case string:
+			parsed, err := uuid.Parse(v)
+			if err != nil {
+				return fmt.Errorf("failed to parse UUID string: %w", err)
+			}
+			*u = BinaryUUID(parsed)
+			return nil
+		case []byte:
+			parsed, err := uuid.ParseBytes(v)
+			if err != nil {
+				return fmt.Errorf("failed to parse UUID bytes: %w", err)
+			}
+			*u = BinaryUUID(parsed)
+			return nil
+		default:
+			return fmt.Errorf("unsupported type for PostgreSQL UUID: %T", value)
+		}
+	case *mysqldialect.Dialect, *sqlitedialect.Dialect:
+		bytes, ok := value.([]byte)
+		if !ok {
+			return fmt.Errorf("expected []byte for MySQL/SQLite UUID, got %T", value)
+		}
+		if len(bytes) != 16 {
+			return fmt.Errorf("expected 16 bytes for UUID, got %d", len(bytes))
+		}
+		parsed, err := uuid.FromBytes(bytes)
+		if err != nil {
+			return fmt.Errorf("failed to parse UUID from bytes: %w", err)
+		}
+		*u = BinaryUUID(parsed)
+		return nil
+	default:
+		return fmt.Errorf("unknown dialect type: %T", dbDialect)
+	}
+}
+
+func (u BinaryUUID) Value() (driver.Value, error) {
+	id := uuid.UUID(u)
+
+	switch dbDialect.(type) {
+	case *pgdialect.Dialect:
+		return id.String(), nil
+	case *mysqldialect.Dialect, *sqlitedialect.Dialect:
+		bytes, err := id.MarshalBinary()
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal UUID to binary: %w", err)
+		}
+		return bytes, nil
+	default:
+		return nil, fmt.Errorf("unknown dialect type: %T", dbDialect)
+	}
+}
+
+func (u BinaryUUID) String() string {
+	return uuid.UUID(u).String()
+}
+
+func (u BinaryUUID) UUID() uuid.UUID {
+	return uuid.UUID(u)
+}
+
+type User struct {
+	bun.BaseModel `bun:"table:users"`
+
+	Id           BinaryUUID `bun:"id,notnull"`
+	Username     string     `bun:"username,notnull"`
+	PasswordSalt []byte     `bun:"password_salt,notnull"`
+	PasswordHash []byte     `bun:"password_hash,notnull"`
+	CreatedAt    time.Time  `bun:"created_at,nullzero,notnull"`
+	UpdatedAt    time.Time  `bun:"updated_at,nullzero,notnull"`
+}
 
 func main() {
 	app := &cli.Command{
@@ -94,56 +192,38 @@ func createUserAction(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("failed to hash password: %w", err)
 	}
 
-	id := uuid.New()
-	now := time.Now()
-
-	var query string
-	var args []any
-
-	switch strings.ToLower(dbType) {
-	case "postgresql":
-		query = `INSERT INTO users (id, username, password_salt, password_hash, created_at, updated_at)
-		         VALUES ($1, $2, $3, $4, $5, $6)`
-		args = []any{id, username, salt, passwordHash, now, now}
-
-	case "mysql":
-		query = `INSERT INTO users (id, username, password_salt, password_hash, created_at, updated_at)
-		         VALUES (?, ?, ?, ?, ?, ?)`
-		args = []any{id[:], username, salt, passwordHash, now, now}
-
-	case "sqlite":
-		query = `INSERT INTO users (id, username, password_salt, password_hash, created_at, updated_at)
-		         VALUES (?, ?, ?, ?, ?, ?)`
-		args = []any{id[:], username, salt, passwordHash, now.Format(time.RFC3339), now.Format(time.RFC3339)}
-
-	default:
-		return fmt.Errorf("unsupported database type: %s", dbType)
+	user := &User{
+		Id:           BinaryUUID(uuid.New()),
+		Username:     username,
+		PasswordSalt: salt,
+		PasswordHash: passwordHash,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
-
-	_, err = db.ExecContext(ctx, query, args...)
+	_, err = db.NewInsert().Model(user).Exec(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to create user: %w", err)
 	}
 
-	fmt.Printf("User created successfully: %s (ID: %s)\n", username, id)
+	fmt.Printf("User created successfully: %s\n", username)
 	return nil
 }
 
-func detectDBType(url string) (string, error) {
+func detectDBType(url string) (DBType, error) {
 	lowerURL := strings.ToLower(url)
 
-	if strings.HasPrefix(lowerURL, "postgresql://") {
-		return "postgresql", nil
+	if strings.HasPrefix(lowerURL, "postgres://") {
+		return DBTypePostgres, nil
 	}
 	if strings.HasPrefix(lowerURL, "mysql://") {
-		return "mysql", nil
+		return DBTypeMySQL, nil
 	}
 	if strings.HasPrefix(lowerURL, "sqlite://") {
-		return "sqlite", nil
+		return DBTypeSQLite, nil
 	}
 
-	return "", fmt.Errorf(
-		"unable to detect database type from URL: %s (supported: postgresql://, mysql:// or sqlite://)",
+	return 0, fmt.Errorf(
+		"unable to detect database type from URL: %s (supported: postgres://, mysql:// or sqlite://)",
 		url,
 	)
 }
@@ -160,44 +240,44 @@ func hashPassword(password string) (salt, hash []byte, err error) {
 	return saltBytes, hashBytes, nil
 }
 
-func initDB(url, dbType string) (*sql.DB, error) {
-	var db *sql.DB
-	var err error
+func initDB(url string, dbType DBType) (*bun.DB, error) {
+	var sqldb *sql.DB
 
-	switch strings.ToLower(dbType) {
-	case "postgresql":
-		db, err = sql.Open("postgres", url)
-		if err != nil {
-			return nil, fmt.Errorf("failed to open postgres connection: %w", err)
-		}
-	case "mysql":
-		mysqlDSN := url
+	switch dbType {
+	case DBTypePostgres:
+		sqldb = sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(url)))
+		dbDialect = pgdialect.New()
+	case DBTypeMySQL:
+		var err error
 		if strings.HasPrefix(url, "mysql://") {
-			mysqlDSN, err = convertMySQLURL(url)
+			url, err = convertMySQLURL(url)
 			if err != nil {
 				return nil, fmt.Errorf("failed to convert MySQL URL: %w", err)
 			}
 		}
-		db, err = sql.Open("mysql", mysqlDSN)
+		sqldb, err = sql.Open("mysql", url)
 		if err != nil {
 			return nil, fmt.Errorf("failed to open mysql connection: %w", err)
 		}
-	case "sqlite":
-		sqliteURL := url
-		if after, ok := strings.CutPrefix(url, "sqlite://"); ok {
-			sqliteURL = after
-			if sqliteURL == "/:memory:" {
-				sqliteURL = ":memory:"
+		dbDialect = mysqldialect.New()
+	case DBTypeSQLite:
+		if cut, ok := strings.CutPrefix(url, "sqlite://"); ok {
+			url = cut
+			if url == "/:memory:" {
+				url = ":memory:"
 			}
 		}
-		db, err = sql.Open("sqlite3", sqliteURL)
+		var err error
+		sqldb, err = sql.Open(sqliteshim.ShimName, url)
 		if err != nil {
 			return nil, fmt.Errorf("failed to open sqlite connection: %w", err)
 		}
+		dbDialect = sqlitedialect.New()
 	default:
-		return nil, fmt.Errorf("unsupported database type: %s (supported: postgresql, mysql, sqlite)", dbType)
+		return nil, fmt.Errorf("unsupported database type: %s (supported: postgres, mysql, sqlite)", dbType)
 	}
 
+	db := bun.NewDB(sqldb, dbDialect)
 	if err := db.Ping(); err != nil {
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}

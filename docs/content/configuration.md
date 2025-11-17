@@ -2,7 +2,7 @@
 ## Platform Configuration
 | Environment Variable    | Is Required? | Description                | Value Example                                           |
 |:------------------------|:-------------|:---------------------------|:--------------------------------------------------------|
-| GREENER_DATABASE_URL    | *Yes*        | Database URL               | `postgresql://postgres:qwerty@db:5432/postgres` |
+| GREENER_DATABASE_URL    | *Yes*        | Database URL               | `postgres://postgres:qwerty@db:5432/postgres` |
 | GREENER_JWT_SECRET      | *Yes*        | JWT secret                 | `abcdefg1234567`                                        |
 
 ## Plugins Configuration

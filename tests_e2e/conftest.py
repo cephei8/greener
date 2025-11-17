@@ -66,14 +66,14 @@ def db_postgres(network):
         network
     ).with_network_aliases("db").with_exposed_ports(5432) as postgres:
         network_url = (
-            "postgresql://"
+            "postgres://"
             f"{postgres.username}:{postgres.password}@"
             "db:5432/"
             f"{postgres.dbname}?sslmode=disable"
         )
 
         host_url = (
-            "postgresql://"
+            "postgres://"
             f"{postgres.username}:{postgres.password}@"
             f"{postgres.get_container_host_ip()}:{postgres.get_exposed_port(5432)}/"
             f"{postgres.dbname}?sslmode=disable"
