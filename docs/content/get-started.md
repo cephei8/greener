@@ -5,7 +5,7 @@ Pull and run the Docker image [cephei8/greener](https://hub.docker.com/r/cephei8
 
 The following environment variables must be specified:
 
-- `GREENER_DATABASE_URL`: database url, e.g. `postgresql://postgres:qwerty@localhost:5432/postgres?ssl=disable`
+- `GREENER_DATABASE_URL`: database url, e.g. `postgres://postgres:qwerty@localhost:5432/postgres?ssl=disable`
 - `GREENER_JWT_SECRET` - JWT secret, e.g. `abcdefg1234567`
 
 ## Plugin setup

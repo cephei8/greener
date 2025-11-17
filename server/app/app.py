@@ -22,9 +22,9 @@ if not url.database:
     )
 
 driver_mapping = {
-    "sqlite": "aiosqlite",
-    "postgresql": "psycopg_async",
-    "mysql": "asyncmy",
+    "sqlite": "sqlite+aiosqlite",
+    "postgres": "postgresql+psycopg_async",
+    "mysql": "mysql+asyncmy",
 }
 driver = driver_mapping.get(url.drivername)
 if not driver:
@@ -32,7 +32,7 @@ if not driver:
         f"Database is not supported, required {list(driver_mapping.keys())}, got '{url.drivername}'"
     )
 
-DATABASE_URL = url.set(drivername=f"{url.drivername}+{driver}").render_as_string(
+DATABASE_URL = url.set(drivername=driver).render_as_string(
     hide_password=False
 )
 

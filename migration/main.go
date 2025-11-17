@@ -17,8 +17,8 @@ import (
 //go:embed db/sqlite/*.sql
 var sqliteMigrationFS embed.FS
 
-//go:embed db/postgresql/*.sql
-var postgresqlMigrationFS embed.FS
+//go:embed db/postgres/*.sql
+var postgresMigrationFS embed.FS
 
 //go:embed db/mysql/*.sql
 var mysqlMigrationFS embed.FS
@@ -62,16 +62,16 @@ func main() {
 	case "sqlite":
 		migrationFS = sqliteMigrationFS
 		migrationDir = "db/sqlite"
-	case "postgresql":
-		migrationFS = postgresqlMigrationFS
-		migrationDir = "db/postgresql"
+	case "postgres":
+		migrationFS = postgresMigrationFS
+		migrationDir = "db/postgres"
 	case "mysql":
 		migrationFS = mysqlMigrationFS
 		migrationDir = "db/mysql"
 	default:
 		fmt.Fprintf(
 			os.Stderr,
-			"Unsupported database protocol: %s (supported: sqlite, postgresql, mysql)\n",
+			"Unsupported database protocol: %s (supported: sqlite, postgres, mysql)\n",
 			u.Scheme,
 		)
 		os.Exit(1)
