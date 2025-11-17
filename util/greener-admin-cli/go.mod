@@ -8,7 +8,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/urfave/cli/v3 v3.6.0
-	golang.org/x/crypto v0.43.0
+	golang.org/x/crypto v0.44.0
 )
 
 require filippo.io/edwards25519 v1.1.0 // indirect
