@@ -1,0 +1,13 @@
+@implements IDialogContentComponent<CreateApikeyDialog.CreateApikeyDto>
+
+<FluentTextField @bind-Value="@Content.Description">API key description (optional):</FluentTextField>
+
+@code {
+    public class CreateApikeyDto
+    {
+        public string? Description { get; set; }
+    }
+
+    [CascadingParameter] public FluentDialog Dialog { get; set; } = null!;
+    [Parameter] public CreateApikeyDto Content { get; set; } = null!;
+}

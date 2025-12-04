@@ -1,0 +1,176 @@
+﻿@page "/apikeys"
+@using System.Diagnostics
+@using System.Text
+@using GreenerBlazor.Components
+@using GreenerBlazor.Models
+@using GreenerBlazor.Services
+@using Microsoft.AspNetCore.Http
+@inject ApiKeyService ApiKeyService
+@inject ExceptionService ExceptionService
+@inject IDialogService DialogService
+
+<PageTitle>API Keys</PageTitle>
+<h2>API Keys</h2>
+<br/>
+
+<AuthorizeView>
+    <Authorized Context="authContext">
+        <FluentButton IconStart="@(new Icons.Filled.Size20.AddCircle())"
+                        Appearance="Appearance.Accent"
+                        OnClick="@OpenCreateApikeyDialogAsync">
+            Create API key
+        </FluentButton>
+    </Authorized>
+    <NotAuthorized Context="authContext">
+        <FluentButton IconStart="@(new Icons.Filled.Size20.AddCircle())"
+                      Appearance="Appearance.Accent"
+                      Disabled="true">
+            Create API key
+        </FluentButton>
+    </NotAuthorized>
+</AuthorizeView>
+
+<br/>
+<br/>
+<FluentDataGrid Items="@_apikeys" RowSize="@DataGridRowSize.Medium"
+                GenerateHeader="@GenerateHeaderOption.Sticky"
+                ShowHover="true" ResizableColumns="true">
+    <ChildContent>
+        <PropertyColumn Width="300px" Property="@(c => c.Id)"/>
+        <PropertyColumn Property="@(c => c.Description)"/>
+        <TemplateColumn Width="100px" Title="Actions" Align="@Align.Center">
+            <AuthorizeView>
+                <Authorized Context="authContext">
+                    <FluentButton aria-label="Delete key"
+                                    IconEnd="@(new Icons.Regular.Size16.Delete())"
+                                    OnClick="@(async () => await DeleteApikey(context))"/>
+                </Authorized>
+                <NotAuthorized Context="authContext">
+                    <FluentButton aria-label="Delete key" IconEnd="@(new Icons.Regular.Size16.Delete())"
+                                  Disabled="true"/>
+                </NotAuthorized>
+            </AuthorizeView>
+        </TemplateColumn>
+    </ChildContent>
+    <EmptyContent>
+        <FluentIcon Value="@(new Icons.Filled.Size24.SearchSquare())" Color="@Color.Accent"/>
+        No API Keys.
+    </EmptyContent>
+</FluentDataGrid>
+
+@code {
+    [CascadingParameter] private HttpContext? HttpContext { get; set; }
+
+    private IQueryable<ApiKeyDto> _apikeys = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchApikeys();
+    }
+
+    private async Task FetchApikeys()
+    {
+        PaginatedResponseDto<ApiKeyDto> response;
+        try
+        {
+            response = await ApiKeyService.GetApiKeysAsync(0, 100, CancellationToken.None);
+        }
+        catch (HttpRequestException exc)
+        {
+            if (await ExceptionService.HandleAsMessageBar(exc))
+            {
+                return;
+            }
+
+            throw;
+        }
+
+        _apikeys = response.Items.AsQueryable();
+    }
+
+    private async Task DeleteApikey(ApiKeyDto apikey)
+    {
+        try
+        {
+            await ApiKeyService.DeleteApiKeyAsync(apikey.Id, CancellationToken.None);
+            await FetchApikeys();
+        }
+        catch (HttpRequestException exc)
+        {
+            if (await ExceptionService.HandleAsMessageBox(exc))
+            {
+                return;
+            }
+
+            throw;
+        }
+    }
+
+    private async Task OpenCreateApikeyDialogAsync()
+    {
+        DialogParameters parameters = new()
+        {
+            Title = "Create API key",
+            PrimaryAction = "Create",
+            SecondaryAction = "Cancel",
+            Width = "500px",
+            TrapFocus = true,
+            Modal = true,
+            PreventScroll = true
+        };
+
+        var createApikeyDto = new CreateApikeyDialog.CreateApikeyDto();
+        IDialogReference dialog = await DialogService.ShowDialogAsync<CreateApikeyDialog>(createApikeyDto, parameters);
+        DialogResult result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            Debug.Assert(result.Data is not null);
+            Debug.Assert(result.Data is CreateApikeyDialog.CreateApikeyDto);
+            Debug.Assert(ReferenceEquals(createApikeyDto, (CreateApikeyDialog.CreateApikeyDto)result.Data));
+
+            var createRequest = new CreateApiKeyRequestDto
+            {
+                Description = createApikeyDto.Description
+            };
+
+            CreateApiKeyResponseDto createResponse;
+            try
+            {
+                createResponse = await ApiKeyService.CreateApiKeyAsync(createRequest, CancellationToken.None);
+            }
+            catch (HttpRequestException exc)
+            {
+                if (await ExceptionService.HandleAsMessageBox(exc))
+                {
+                    return;
+                }
+
+                throw;
+            }
+
+            var respBuilder = new StringBuilder();
+            respBuilder.Append("<span style=\"white-space: pre-line\">");
+            respBuilder.Append("Please copy the API key below. You will not be able to see it again.\n\n");
+            respBuilder.Append($"API key: {createResponse.Key}");
+            respBuilder.Append("</span>");
+
+            var respDialog = await DialogService.ShowMessageBoxAsync(new DialogParameters<MessageBoxContent>
+            {
+                Content = new MessageBoxContent
+                {
+                    Title = "API key created successfully",
+                    MarkupMessage = new MarkupString(respBuilder.ToString()),
+                    Icon = new Icons.Regular.Size24.CheckmarkCircle(),
+                    IconColor = Color.Success
+                },
+                SecondaryAction = null
+            });
+
+            await respDialog.Result;
+
+            await FetchApikeys();
+        }
+    }
+
+}
