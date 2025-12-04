@@ -1,0 +1,67 @@
+﻿@page "/account"
+@using GreenerBlazor.Models
+@using GreenerBlazor.Services
+@inject NavigationManager NavManager
+@inject AuthService AuthService
+@inject ExceptionService ExceptionService
+
+<PageTitle>Account</PageTitle>
+
+<h2>Account</h2>
+<br/>
+
+<FluentStack Orientation="Orientation.Vertical">
+    <EditForm Model="@ChangePasswordRequestDto" OnValidSubmit="@ChangePassword" FormName="change_password_form">
+        <DataAnnotationsValidator/>
+
+        <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.Center"
+                     VerticalAlignment="VerticalAlignment.Center">
+            <h4>Change Password</h4>
+            <div>
+                <FluentTextField Name="current_password" @bind-Value="ChangePasswordRequestDto.PasswordOld"
+                                 Label="Current password"
+                                 TextFieldType="TextFieldType.Password" Required/>
+            </div>
+            <FluentValidationMessage For="@(() => ChangePasswordRequestDto.PasswordOld)"/>
+            <div>
+                <FluentTextField Name="new_password" @bind-Value="ChangePasswordRequestDto.PasswordNew"
+                                 Label="New password"
+                                 TextFieldType="TextFieldType.Password" Required/>
+            </div>
+            <FluentValidationMessage For="@(() => ChangePasswordRequestDto.PasswordNew)"/>
+            <div>
+                <FluentTextField Name="confirm_new_password" @bind-Value="ChangePasswordRequestDto.ConfirmPasswordNew"
+                                 Label="Confirm new password"
+                                 TextFieldType="TextFieldType.Password" Required/>
+            </div>
+            <FluentValidationMessage For="@(() => ChangePasswordRequestDto.ConfirmPasswordNew)"/>
+            <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">Change password</FluentButton>
+            <br/>
+        </FluentStack>
+    </EditForm>
+</FluentStack>
+
+@code {
+
+    [SupplyParameterFromForm] private ChangePasswordRequestDto ChangePasswordRequestDto { get; set; } = new();
+
+    private async Task ChangePassword()
+    {
+        try
+        {
+            await AuthService.ChangePasswordAsync(ChangePasswordRequestDto, CancellationToken.None);
+        }
+        catch (HttpRequestException exc)
+        {
+            if (await ExceptionService.HandleAsMessageBox(exc))
+            {
+                return;
+            }
+
+            throw;
+        }
+
+        NavManager.NavigateTo("/");
+    }
+
+}

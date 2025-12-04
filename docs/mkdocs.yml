@@ -1,0 +1,55 @@
+site_name: Greener
+site_url: https://greener.cephei8.dev
+repo_url: https://github.com/cephei8/greener
+docs_dir: content
+nav:
+  - Greener: index.md
+  - Get Started: get-started.md
+  - Configuration: configuration.md
+  - Query Language: query-language.md
+  - Plugins: plugins.md
+  - Contact: contact.md
+theme:
+  name: material
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue grey
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue grey
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  features:
+    - header.autohide
+    - navigation.expand
+    - content.code.copy
+    - content.tabs.link
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.top
+    - navigation.tracking
+    - toc.follow
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+extra:
+  social:
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/r/cephei8/greener
+    - icon: fontawesome/brands/git-alt
+      link: https://git.sr.ht/~cephei8/greener

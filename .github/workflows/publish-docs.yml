@@ -1,0 +1,42 @@
+name: Publish Docs
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish_docs_build:
+    name: (Publish Docs) Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        
+      - uses: actions/setup-python@v6
+        with:
+          python-version: 3.x
+
+      - run: pip install -r docs/requirements.txt
+
+      - run: mkdocs build --site-dir public_output
+        working-directory: docs
+
+      - name: Upload static files
+        id: deployment
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./docs/public_output/
+
+  publish_docs_deploy:
+    name: (Publish Docs) Deploy
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      id-token: write
+      pages: write
+      contents: read
+    runs-on: ubuntu-latest
+    needs: publish_docs_build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
