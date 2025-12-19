@@ -1,5 +1,5 @@
 # Greener
-Greener is a platform for storing and viewing test results.  
+Greener is a platform for storing and exploring test results.  
 It is easy to configure and self-host, integrates with your favorite test framework (see [Plugins](plugins.md)) and supports a simple query language to let you access the data you need.
 
 ![Greener UI](assets/greener_ui.png)

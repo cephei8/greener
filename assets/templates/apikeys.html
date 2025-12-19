@@ -1,0 +1,176 @@
+{{define "title"}}API Keys{{end}}
+
+{{define "body"}}
+
+<div class="navbar bg-base-100 shadow-sm">
+    <div class="navbar-start">
+        <div class="dropdown">
+            <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+                </svg>
+            </div>
+            <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+                <li><a href="/sessions">Sessions</a></li>
+                <li><a href="/testcases">Testcases</a></li>
+                <li><a href="/groups">Groups</a></li>
+                <li><a href="/api-keys" class="active">API Keys</a></li>
+            </ul>
+        </div>
+        <a href="/sessions" class="btn btn-ghost text-xl">Greener</a>
+    </div>
+    <div class="navbar-center hidden lg:flex">
+        <ul class="menu menu-horizontal px-1">
+            <li><a href="/sessions">Sessions</a></li>
+            <li><a href="/testcases">Testcases</a></li>
+            <li><a href="/groups">Groups</a></li>
+            <li><a href="/api-keys" class="active">API Keys</a></li>
+        </ul>
+    </div>
+    <div class="navbar-end">
+        <a href="#" hx-post="/logout" class="btn">Logout</a>
+    </div>
+</div>
+
+<div class="container mx-auto p-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">API Keys</h1>
+        <button
+            class="btn btn-primary"
+            onclick="create_modal.showModal()">
+            Create API Key
+        </button>
+    </div>
+
+    <!-- API Keys Table -->
+    <div id="apikeys-table">
+        {{if .APIKeys}}
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+                <thead>
+                    <tr>
+                        <th class="w-80">ID</th>
+                        <th>Description</th>
+                        <th class="w-48">Created At</th>
+                        <th class="w-24">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .APIKeys}}
+                    <tr>
+                        <td class="font-mono text-xs">{{.ID}}</td>
+                        <td>{{if .Description}}{{.Description}}{{else}}<span class="text-gray-400">No description</span>{{end}}</td>
+                        <td class="text-sm">{{.CreatedAt}}</td>
+                        <td>
+                            <button
+                                class="btn btn-sm btn-error"
+                                hx-delete="/api-keys/{{.ID}}"
+                                hx-target="#apikeys-table"
+                                hx-confirm="Are you sure you want to delete this API key?">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+        {{else}}
+        <div class="text-center py-12 text-gray-500">
+            <p>No API keys found. Create one to get started.</p>
+        </div>
+        {{end}}
+    </div>
+
+    <!-- Create API Key Modal -->
+    <dialog id="create_modal" class="modal">
+        <div class="modal-box">
+            <div id="modal-container">
+                <h3 class="font-bold text-lg mb-4">Create API Key</h3>
+                <form id="create-form">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Description (optional)</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="description"
+                            placeholder="Enter a description for this API key"
+                            class="input input-bordered w-full" />
+                    </div>
+                    <div class="modal-action">
+                        <button
+                            type="button"
+                            class="btn"
+                            onclick="create_modal.close();">
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                            hx-post="/api-keys/create"
+                            hx-target="#modal-container"
+                            hx-include="[name='description']">
+                            Create
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+</div>
+
+<script>
+// Minimal JS only for clipboard functionality
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text);
+    event.target.innerText = 'Copied!';
+    setTimeout(() => event.target.innerText = 'Copy', 2000);
+}
+
+// Reset modal when closed
+document.getElementById('create_modal').addEventListener('close', function() {
+    setTimeout(() => {
+        const container = document.getElementById('modal-container');
+        container.innerHTML = `
+            <h3 class="font-bold text-lg mb-4">Create API Key</h3>
+            <form id="create-form">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Description (optional)</span>
+                    </label>
+                    <input
+                        type="text"
+                        name="description"
+                        placeholder="Enter a description for this API key"
+                        class="input input-bordered w-full" />
+                </div>
+                <div class="modal-action">
+                    <button
+                        type="button"
+                        class="btn"
+                        onclick="create_modal.close();">
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                        hx-post="/api-keys/create"
+                        hx-target="#modal-container"
+                        hx-include="[name='description']">
+                        Create
+                    </button>
+                </div>
+            </form>
+        `;
+        htmx.process(container);
+    }, 300);
+});
+</script>
+
+{{end}}
+
+{{template "base.html" .}}

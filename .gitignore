@@ -1,1 +1,12 @@
 .DS_Store
+
+/.direnv
+/greener
+/greener-admin
+
+/greener.db
+
+/node_modules
+/assets/static/dist
+
+/core/query/y.output

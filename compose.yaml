@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5096:5096"
+      - "8080:8080"
     environment:
       GREENER_DATABASE_URL: postgres://postgres:qwerty@db:5432/postgres?sslmode=disable
       GREENER_AUTH_SECRET: abcdefg1234567

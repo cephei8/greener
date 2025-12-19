@@ -1,5 +1,0 @@
-{
-    "editor.inlayHints.enabled": "offUnlessPressed",
-    "editor.suggest.showReferences": false,
-    "dotnet.codeLens.enableReferencesCodeLens": false
-}

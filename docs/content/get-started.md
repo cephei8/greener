@@ -33,24 +33,4 @@ $GOPATH/bin/greener-admin-cli \
 Now, access Greener at http://localhost:5096 in the browser.
 
 ## Plugin setup
-
-=== "Python: pytest"
-
-    ``` shell
-    pip install pytest-greener
-    ```
-
-#### Configure plugin
-
-``` shell
-export GREENER_INGRESS_ENDPOINT=http://localhost:5096
-export GREENER_INGRESS_API_KEY=<api-key>
-```
-Create API key on Greener API Keys page.
-
-#### Run tests with plugin enabled
-=== "Python: pytest"
-
-    ``` shell
-    pytest --greener
-    ```
+Check out [Plugins](plugins.md) for instructions.

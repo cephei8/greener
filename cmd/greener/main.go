@@ -1,0 +1,142 @@
+package main
+
+import (
+	"flag"
+	"fmt"
+	"html/template"
+	"io"
+	"log"
+	"net/http"
+	"os"
+
+	"git.sr.ht/~cephei8/greener/assets"
+	"git.sr.ht/~cephei8/greener/core"
+	"git.sr.ht/~cephei8/greener/core/dbutil"
+	"github.com/caarlos0/env/v11"
+	"github.com/gorilla/sessions"
+	"github.com/labstack/echo-contrib/session"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+)
+
+type Config struct {
+	DatabaseURL string `env:"GREENER_DATABASE_URL"`
+	AuthSecret  string `env:"GREENER_AUTH_SECRET"`
+	Verbose     bool   `env:"GREENER_VERBOSE_OUTPUT"`
+}
+
+type Template struct {
+	templates map[string]*template.Template
+}
+
+func (t *Template) Render(w io.Writer, name string, data any, c echo.Context) error {
+	tmpl, ok := t.templates[name]
+	if !ok {
+		return echo.NewHTTPError(http.StatusInternalServerError, "template not found")
+	}
+	return tmpl.ExecuteTemplate(w, name, data)
+}
+
+func main() {
+	cfg := Config{}
+	if err := env.Parse(&cfg); err != nil {
+		log.Fatalf("Failed to parse environment variables: %v", err)
+	}
+
+	flag.StringVar(&cfg.DatabaseURL, "db-url", cfg.DatabaseURL, "Database URL")
+	flag.StringVar(&cfg.AuthSecret, "auth-secret", cfg.AuthSecret, "Authentication secret key")
+	flag.BoolVar(&cfg.Verbose, "verbose", cfg.Verbose, "Enable verbose output")
+	flag.Parse()
+
+	if cfg.DatabaseURL == "" {
+		fmt.Fprintf(os.Stderr, "Error: database URL is required\n")
+		fmt.Fprintf(os.Stderr, "Usage: Set GREENER_DATABASE_URL or use --db-url flag\n")
+		os.Exit(1)
+	}
+
+	if cfg.AuthSecret == "" {
+		fmt.Fprintf(os.Stderr, "Error: authentication secret is required\n")
+		fmt.Fprintf(os.Stderr, "Usage: Set GREENER_AUTH_SECRET or use --auth-secret flag\n")
+		os.Exit(1)
+	}
+
+	if err := core.Migrate(cfg.DatabaseURL, cfg.Verbose); err != nil {
+		fmt.Fprintf(os.Stderr, "Migration failed: %v\n", err)
+		os.Exit(1)
+	}
+
+	db, err := dbutil.Init(cfg.DatabaseURL)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to initialize database: %v\n", err)
+		os.Exit(1)
+	}
+	defer db.Close()
+
+	e := echo.New()
+
+	funcMap := template.FuncMap{
+		"sub": func(a, b int) int { return a - b },
+		"add": func(a, b int) int { return a + b },
+	}
+
+	templates := make(map[string]*template.Template)
+	templates["login.html"] = template.Must(template.New("").
+		Funcs(funcMap).
+		ParseFS(assets.TemplatesFS, "templates/base.html", "templates/login.html"))
+	templates["testcases.html"] = template.Must(template.New("").
+		Funcs(funcMap).
+		ParseFS(assets.TemplatesFS, "templates/base.html", "templates/query_editor.html", "templates/testcases.html"))
+	templates["sessions.html"] = template.Must(template.New("").
+		Funcs(funcMap).
+		ParseFS(assets.TemplatesFS, "templates/base.html", "templates/query_editor.html", "templates/sessions.html"))
+	templates["groups.html"] = template.Must(template.New("").
+		Funcs(funcMap).
+		ParseFS(assets.TemplatesFS, "templates/base.html", "templates/query_editor.html", "templates/groups.html"))
+	templates["apikeys.html"] = template.Must(template.New("").
+		Funcs(funcMap).
+		ParseFS(assets.TemplatesFS, "templates/base.html", "templates/apikeys.html"))
+
+	templates["testcases_table.html"] = template.Must(template.New("testcases_table.html").
+		Funcs(funcMap).
+		ParseFS(assets.TemplatesFS, "templates/testcases_table.html"))
+	templates["sessions_table.html"] = template.Must(template.New("sessions_table.html").
+		Funcs(funcMap).
+		ParseFS(assets.TemplatesFS, "templates/sessions_table.html"))
+	templates["groups_table.html"] = template.Must(template.New("groups_table.html").
+		Funcs(funcMap).
+		ParseFS(assets.TemplatesFS, "templates/groups_table.html"))
+
+	e.Renderer = &Template{templates: templates}
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte(cfg.AuthSecret))))
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			c.Set("db", db)
+			return next(c)
+		}
+	})
+
+	e.GET("/static/*", echo.WrapHandler(http.FileServer(http.FS(assets.StaticFS))))
+	e.GET("/", core.IndexHandler)
+	e.GET("/login", core.LoginPageHandler)
+	e.POST("/login", core.LoginHandler)
+	e.GET("/testcases", core.TestcasesHandler)
+	e.POST("/testcases/query", core.TestcasesHandler)
+	e.GET("/sessions", core.SessionsHandler)
+	e.POST("/sessions/query", core.SessionsHandler)
+	e.GET("/groups", core.GroupsHandler)
+	e.POST("/groups/query", core.GroupsHandler)
+	e.GET("/api-keys", core.APIKeysHandler)
+	e.POST("/api-keys/create", core.CreateAPIKeyHandler)
+	e.DELETE("/api-keys/:id", core.DeleteAPIKeyHandler)
+	e.POST("/logout", core.LogoutHandler)
+
+	ingressHandler := core.NewIngressHandler(db)
+	apiV1 := e.Group("/api/v1")
+	apiV1Ingress := apiV1.Group("/ingress", core.APIKeyAuth(db))
+	apiV1Ingress.POST("/sessions", ingressHandler.CreateSession)
+	apiV1Ingress.POST("/testcases", ingressHandler.CreateTestcases)
+
+	e.Logger.Fatal(e.Start(":8080"))
+}
