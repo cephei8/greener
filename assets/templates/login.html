@@ -1,0 +1,41 @@
+{{define "title"}}Login{{end}}
+
+{{define "head"}}
+<style>
+    #login-error:empty {
+        display: none;
+    }
+</style>
+{{end}}
+
+{{define "body"}}
+<div class="hero min-h-screen bg-base-200">
+    <div class="hero-content flex-col">
+        <div class="text-center lg:text-left">
+            <h1 class="text-5xl font-bold">Login to Greener</h1>
+        </div>
+        <div class="card bg-base-100 w-full max-w-sm shadow-2xl" hx-ext="response-targets">
+            <form class="card-body" hx-post="/login" hx-target-error="#login-error">
+                <div class="form-control">
+                    <label class="label" for="username">
+                        <span class="label-text">Username</span>
+                    </label>
+                    <input type="text" id="username" name="username" placeholder="username" class="input input-bordered" required />
+                </div>
+                <div class="form-control">
+                    <label class="label" for="password">
+                        <span class="label-text">Password</span>
+                    </label>
+                    <input type="password" id="password" name="password" placeholder="password" class="input input-bordered" required />
+                </div>
+                <div class="form-control mt-6">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </div>
+                <div id="login-error" class="alert alert-error mt-4"></div>
+            </form>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{template "base.html" .}}

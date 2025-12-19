@@ -1,5 +1,0 @@
-/.venv
-/.coverage
-/.pytest_cache
-
-/dev.sqlite
