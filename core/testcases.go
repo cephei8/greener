@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -109,6 +110,7 @@ func TestcasesHandler(c echo.Context) error {
 			SessionID: sessionID.String(),
 			Name:      result.Name,
 			Status:    status,
+			CreatedAt: result.CreatedAt.Format("2006-01-02 15:04:05"),
 		})
 	}
 
@@ -116,5 +118,111 @@ func TestcasesHandler(c echo.Context) error {
 		"Testcases":    testcases,
 		"LoadedCount":  len(testcases),
 		"TotalRecords": totalCount,
+	})
+}
+
+func TestcaseDetailHandler(c echo.Context) error {
+	sess, _ := session.Get("session", c)
+	if auth, ok := sess.Values["authenticated"].(bool); !ok || !auth {
+		return c.Redirect(http.StatusFound, "/login")
+	}
+
+	userIdStr, ok := sess.Values["user_id"].(string)
+	if !ok {
+		sess.Values["authenticated"] = false
+		sess.Save(c.Request(), c.Response())
+		return c.Redirect(http.StatusFound, "/login")
+	}
+
+	userId, err := uuid.Parse(userIdStr)
+	if err != nil {
+		c.Logger().Errorf("Invalid user_id in session: %v", err)
+		sess.Values["authenticated"] = false
+		sess.Save(c.Request(), c.Response())
+		return c.Redirect(http.StatusFound, "/login")
+	}
+
+	testcaseIdStr := c.Param("id")
+	testcaseId, err := uuid.Parse(testcaseIdStr)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid testcase ID")
+	}
+
+	db := c.Get("db").(*bun.DB)
+	ctx := context.Background()
+
+	var testcase model_db.Testcase
+	err = db.NewSelect().
+		Model(&testcase).
+		Where("? = ?", bun.Ident("id"), model_db.BinaryUUID(testcaseId)).
+		Where("? = ?", bun.Ident("user_id"), model_db.BinaryUUID(userId)).
+		Scan(ctx)
+
+	if err != nil {
+		c.Logger().Errorf("Failed to fetch testcase: %v", err)
+		return echo.NewHTTPError(http.StatusNotFound, "Testcase not found")
+	}
+
+	testcaseIDStr, err := uuid.FromBytes(testcase.ID[:])
+	if err != nil {
+		c.Logger().Errorf("Failed to parse testcase UUID: %v", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to parse testcase ID")
+	}
+
+	sessionIDStr, err := uuid.FromBytes(testcase.SessionID[:])
+	if err != nil {
+		c.Logger().Errorf("Failed to parse session UUID: %v", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to parse session ID")
+	}
+
+	status := TestcaseStatusToString(testcase.Status)
+
+	var baggageStr string
+	if testcase.Baggage != nil {
+		var baggageData interface{}
+		if err := json.Unmarshal(testcase.Baggage, &baggageData); err == nil {
+			if formatted, err := json.MarshalIndent(baggageData, "", "  "); err == nil {
+				baggageStr = string(formatted)
+			} else {
+				baggageStr = string(testcase.Baggage)
+			}
+		} else {
+			baggageStr = string(testcase.Baggage)
+		}
+	}
+
+	var outputStr string
+	if testcase.Output != nil {
+		outputStr = *testcase.Output
+	}
+
+	var classnameStr string
+	if testcase.Classname != nil {
+		classnameStr = *testcase.Classname
+	}
+
+	var fileStr string
+	if testcase.File != nil {
+		fileStr = *testcase.File
+	}
+
+	var testsuiteStr string
+	if testcase.Testsuite != nil {
+		testsuiteStr = *testcase.Testsuite
+	}
+
+	return c.Render(http.StatusOK, "testcase_detail.html", map[string]any{
+		"Testcase": map[string]any{
+			"ID":        testcaseIDStr.String(),
+			"SessionID": sessionIDStr.String(),
+			"Name":      testcase.Name,
+			"Classname": classnameStr,
+			"File":      fileStr,
+			"Testsuite": testsuiteStr,
+			"Status":    status,
+			"Baggage":   baggageStr,
+			"Output":    outputStr,
+			"CreatedAt": testcase.CreatedAt.Format("2006-01-02 15:04:05"),
+		},
 	})
 }

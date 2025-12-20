@@ -1,0 +1,165 @@
+{{define "title"}}Testcase Details{{end}}
+
+{{define "head"}}
+<style>
+    .detail-table {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .detail-table td:first-child {
+        font-weight: 600;
+        width: 200px;
+        padding-right: 1rem;
+    }
+    .monospace-section {
+        background-color: hsl(var(--b2));
+        padding: 1rem;
+        border-radius: 0.5rem;
+        font-family: monospace;
+        white-space: pre-wrap;
+        overflow-x: auto;
+        font-size: 0.875rem;
+        max-width: 100%;
+    }
+    .content-section {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .section-header {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid hsl(var(--b3));
+    }
+    .section-container {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background-color: hsl(var(--b1));
+        border-radius: 0.5rem;
+        border: 1px solid hsl(var(--b3));
+    }
+</style>
+{{end}}
+
+{{define "body"}}
+
+<div class="navbar bg-base-100 shadow-sm">
+    <div class="navbar-start">
+        <div class="dropdown">
+            <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+                </svg>
+            </div>
+            <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+                <li><a href="/sessions">Sessions</a></li>
+                <li><a href="/testcases" class="active">Testcases</a></li>
+                <li><a href="/groups">Groups</a></li>
+                <li><a href="/api-keys">API Keys</a></li>
+            </ul>
+        </div>
+        <a href="/sessions" class="btn btn-ghost text-xl">Greener</a>
+    </div>
+    <div class="navbar-center hidden lg:flex">
+        <ul class="menu menu-horizontal px-1">
+            <li><a href="/sessions">Sessions</a></li>
+            <li><a href="/testcases" class="active">Testcases</a></li>
+            <li><a href="/groups">Groups</a></li>
+            <li><a href="/api-keys">API Keys</a></li>
+        </ul>
+    </div>
+    <div class="navbar-end">
+        <a href="#" hx-post="/logout" class="btn">Logout</a>
+    </div>
+</div>
+
+<div class="p-8">
+    <div class="content-section">
+        <div class="mb-4">
+            <a href="/testcases" class="btn btn-sm btn-ghost">← Back to Testcases</a>
+        </div>
+
+        <div class="section-container">
+            <h2 class="section-header">Testcase Details</h2>
+            <table class="detail-table">
+                <tbody>
+                <tr>
+                    <td class="py-2">ID</td>
+                    <td class="py-2 font-mono text-sm">{{.Testcase.ID}}</td>
+                </tr>
+                <tr>
+                    <td class="py-2">Session ID</td>
+                    <td class="py-2 font-mono text-sm">{{.Testcase.SessionID}}</td>
+                </tr>
+                <tr>
+                    <td class="py-2">Name</td>
+                    <td class="py-2">{{.Testcase.Name}}</td>
+                </tr>
+                {{if .Testcase.Classname}}
+                <tr>
+                    <td class="py-2">Classname</td>
+                    <td class="py-2">{{.Testcase.Classname}}</td>
+                </tr>
+                {{end}}
+                {{if .Testcase.File}}
+                <tr>
+                    <td class="py-2">File</td>
+                    <td class="py-2">{{.Testcase.File}}</td>
+                </tr>
+                {{end}}
+                {{if .Testcase.Testsuite}}
+                <tr>
+                    <td class="py-2">Testsuite</td>
+                    <td class="py-2">{{.Testcase.Testsuite}}</td>
+                </tr>
+                {{end}}
+                <tr>
+                    <td class="py-2">Status</td>
+                    <td class="py-2 flex items-center gap-2">
+                        {{if eq .Testcase.Status "pass"}}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {{else if or (eq .Testcase.Status "fail") (eq .Testcase.Status "error")}}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {{else if eq .Testcase.Status "skip"}}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {{end}}
+                        <span class="badge {{if eq .Testcase.Status "pass"}}badge-success{{else if or (eq .Testcase.Status "fail") (eq .Testcase.Status "error")}}badge-error{{else if eq .Testcase.Status "skip"}}badge-warning{{end}}">
+                            {{.Testcase.Status}}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="py-2">Created At</td>
+                    <td class="py-2">{{.Testcase.CreatedAt}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        {{if .Testcase.Baggage}}
+        <div class="section-container">
+            <h2 class="section-header">Baggage</h2>
+            <div class="monospace-section">{{.Testcase.Baggage}}</div>
+        </div>
+        {{end}}
+
+        {{if .Testcase.Output}}
+        <div class="section-container">
+            <h2 class="section-header">Output</h2>
+            <div class="monospace-section">{{.Testcase.Output}}</div>
+        </div>
+        {{end}}
+    </div>
+</div>
+
+{{end}}
+
+{{template "base.html" .}}

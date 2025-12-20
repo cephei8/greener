@@ -6,7 +6,60 @@
     #query-error:empty {
         display: none;
     }
+    .copy-tooltip {
+        position: absolute;
+        background-color: hsl(var(--su));
+        color: hsl(var(--suc));
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        pointer-events: none;
+        opacity: 0;
+        transform: translateY(-0.5rem);
+        transition: opacity 0.2s, transform 0.2s;
+        z-index: 1000;
+        white-space: nowrap;
+    }
+    .copy-tooltip.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
 </style>
+<script>
+    function copySessionId(id, event) {
+        event.preventDefault();
+        const textToCopy = '"' + id + '"';
+        navigator.clipboard.writeText(textToCopy).then(function() {
+            showCopyFeedback(event.target);
+        }).catch(function(err) {
+            console.error('Failed to copy: ', err);
+        });
+    }
+
+    function showCopyFeedback(element) {
+        const tooltip = document.createElement('div');
+        tooltip.className = 'copy-tooltip';
+        tooltip.textContent = 'Copied!';
+
+        const rect = element.getBoundingClientRect();
+        tooltip.style.left = rect.left + (rect.width / 2) - 30 + 'px';
+        tooltip.style.top = rect.top - 30 + 'px';
+
+        document.body.appendChild(tooltip);
+
+        setTimeout(function() {
+            tooltip.classList.add('show');
+        }, 10);
+
+        setTimeout(function() {
+            tooltip.classList.remove('show');
+            setTimeout(function() {
+                document.body.removeChild(tooltip);
+            }, 200);
+        }, 1500);
+    }
+</script>
 {{end}}
 
 {{define "body"}}
@@ -71,6 +124,7 @@
                             <th class="w-80">ID</th>
                             <th>Description</th>
                             <th class="w-48">Created At</th>
+                            <th class="w-24">Details</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -92,10 +146,13 @@
                                 {{end}}
                             </td>
                             <td class="font-mono text-xs">
-                                <a href="/sessions/{{.ID}}" class="badge badge-ghost badge-sm hover:badge-primary transition-colors">{{.ID}}</a>
+                                <a href="#" onclick="copySessionId('{{.ID}}', event)" class="badge badge-ghost badge-sm hover:badge-primary transition-colors">{{.ID}}</a>
                             </td>
                             <td>{{.Description}}</td>
                             <td class="text-sm">{{.CreatedAt}}</td>
+                            <td>
+                                <a href="/sessions/{{.ID}}/details" class="btn btn-sm btn-ghost hover:btn-primary transition-colors">Details</a>
+                            </td>
                         </tr>
                         {{end}}
                     </tbody>
