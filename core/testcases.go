@@ -40,6 +40,9 @@ func TestcasesHandler(c echo.Context) error {
 	ctx := context.Background()
 
 	queryStr := c.FormValue("query")
+	if queryStr == "" {
+		queryStr = c.QueryParam("query")
+	}
 
 	isHTMX := c.Request().Header.Get("HX-Request") == "true"
 	templateName := "testcases.html"
@@ -118,6 +121,7 @@ func TestcasesHandler(c echo.Context) error {
 		"Testcases":    testcases,
 		"LoadedCount":  len(testcases),
 		"TotalRecords": totalCount,
+		"Query":        queryStr,
 	})
 }
 

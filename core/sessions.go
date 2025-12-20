@@ -40,6 +40,9 @@ func SessionsHandler(c echo.Context) error {
 	ctx := context.Background()
 
 	queryStr := c.FormValue("query")
+	if queryStr == "" {
+		queryStr = c.QueryParam("query")
+	}
 	c.Logger().Infof("Sessions handler called, queryStr='%s', userID=%s", queryStr, userId)
 
 	isHTMX := c.Request().Header.Get("HX-Request") == "true"
@@ -119,6 +122,7 @@ func SessionsHandler(c echo.Context) error {
 		"Sessions":     sessions,
 		"LoadedCount":  len(sessions),
 		"TotalRecords": totalCount,
+		"Query":        queryStr,
 	})
 }
 

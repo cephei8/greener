@@ -247,6 +247,12 @@ function initEditor() {
         });
     }
 
+    if (window.initialQuery && window.initialQuery.trim() !== '') {
+        editor.textContent = window.initialQuery;
+        hiddenInput.value = window.initialQuery;
+        highlight();
+    }
+
     console.log('Prism query editor initialized');
 }
 
