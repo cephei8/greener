@@ -9,6 +9,7 @@
                 <th class="w-80">ID</th>
                 <th>Description</th>
                 <th class="w-48">Created At</th>
+                <th class="w-24">Details</th>
             </tr>
         </thead>
         <tbody>
@@ -30,10 +31,13 @@
                     {{end}}
                 </td>
                 <td class="font-mono text-xs">
-                    <a href="/sessions/{{.ID}}" class="badge badge-ghost badge-sm hover:badge-primary transition-colors">{{.ID}}</a>
+                    <a href="#" onclick="copySessionId('{{.ID}}', event)" class="badge badge-ghost badge-sm hover:badge-primary transition-colors">{{.ID}}</a>
                 </td>
                 <td>{{.Description}}</td>
                 <td class="text-sm">{{.CreatedAt}}</td>
+                <td>
+                    <a href="/sessions/{{.ID}}/details" class="btn btn-sm btn-ghost hover:btn-primary transition-colors">Details</a>
+                </td>
             </tr>
             {{end}}
         </tbody>

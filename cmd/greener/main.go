@@ -86,9 +86,15 @@ func main() {
 	templates["testcases.html"] = template.Must(template.New("").
 		Funcs(funcMap).
 		ParseFS(assets.TemplatesFS, "templates/base.html", "templates/query_editor.html", "templates/testcases.html"))
+	templates["testcase_detail.html"] = template.Must(template.New("").
+		Funcs(funcMap).
+		ParseFS(assets.TemplatesFS, "templates/base.html", "templates/testcase_detail.html"))
 	templates["sessions.html"] = template.Must(template.New("").
 		Funcs(funcMap).
 		ParseFS(assets.TemplatesFS, "templates/base.html", "templates/query_editor.html", "templates/sessions.html"))
+	templates["session_detail.html"] = template.Must(template.New("").
+		Funcs(funcMap).
+		ParseFS(assets.TemplatesFS, "templates/base.html", "templates/session_detail.html"))
 	templates["groups.html"] = template.Must(template.New("").
 		Funcs(funcMap).
 		ParseFS(assets.TemplatesFS, "templates/base.html", "templates/query_editor.html", "templates/groups.html"))
@@ -123,8 +129,10 @@ func main() {
 	e.POST("/login", core.LoginHandler)
 	e.GET("/testcases", core.TestcasesHandler)
 	e.POST("/testcases/query", core.TestcasesHandler)
+	e.GET("/testcases/:id/details", core.TestcaseDetailHandler)
 	e.GET("/sessions", core.SessionsHandler)
 	e.POST("/sessions/query", core.SessionsHandler)
+	e.GET("/sessions/:id/details", core.SessionDetailHandler)
 	e.GET("/groups", core.GroupsHandler)
 	e.POST("/groups/query", core.GroupsHandler)
 	e.GET("/api-keys", core.APIKeysHandler)

@@ -5,6 +5,7 @@ type Testcase struct {
 	SessionID string
 	Name      string
 	Status    string
+	CreatedAt string
 }
 
 type Session struct {

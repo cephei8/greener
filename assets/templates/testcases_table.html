@@ -9,6 +9,8 @@
                 <th class="w-80">Session</th>
                 <th class="w-80">ID</th>
                 <th>Name</th>
+                <th class="w-48">Created At</th>
+                <th class="w-24">Details</th>
             </tr>
         </thead>
         <tbody>
@@ -30,12 +32,16 @@
                     {{end}}
                 </td>
                 <td class="font-mono text-xs">
-                    <a href="/sessions/{{.SessionID}}" class="badge badge-ghost badge-sm hover:badge-primary transition-colors">{{.SessionID}}</a>
+                    <a href="#" onclick="copyId('{{.SessionID}}', event)" class="badge badge-ghost badge-sm hover:badge-primary transition-colors">{{.SessionID}}</a>
                 </td>
                 <td class="font-mono text-xs">
-                    <a href="/testcases/{{.ID}}" class="badge badge-ghost badge-sm hover:badge-primary transition-colors">{{.ID}}</a>
+                    <a href="#" onclick="copyId('{{.ID}}', event)" class="badge badge-ghost badge-sm hover:badge-primary transition-colors">{{.ID}}</a>
                 </td>
                 <td>{{.Name}}</td>
+                <td class="text-sm">{{.CreatedAt}}</td>
+                <td>
+                    <a href="/testcases/{{.ID}}/details" class="btn btn-sm btn-ghost hover:btn-primary transition-colors">Details</a>
+                </td>
             </tr>
             {{end}}
         </tbody>
