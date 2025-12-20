@@ -40,6 +40,9 @@ func GroupsHandler(c echo.Context) error {
 	ctx := context.Background()
 
 	queryStr := c.FormValue("query")
+	if queryStr == "" {
+		queryStr = c.QueryParam("query")
+	}
 
 	isHTMX := c.Request().Header.Get("HX-Request") == "true"
 	templateName := "groups.html"
@@ -52,6 +55,7 @@ func GroupsHandler(c echo.Context) error {
 			"Groups":       []model_api.Group{},
 			"LoadedCount":  0,
 			"TotalRecords": 0,
+			"Query":        "",
 		})
 	}
 
@@ -72,6 +76,7 @@ func GroupsHandler(c echo.Context) error {
 			"Groups":       []model_api.Group{},
 			"LoadedCount":  0,
 			"TotalRecords": 0,
+			"Query":        queryStr,
 		})
 	}
 
@@ -166,5 +171,6 @@ func GroupsHandler(c echo.Context) error {
 		"Groups":       groups,
 		"LoadedCount":  len(groups),
 		"TotalRecords": totalCount,
+		"Query":        queryStr,
 	})
 }

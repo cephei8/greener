@@ -59,6 +59,27 @@
             }, 200);
         }, 1500);
     }
+
+    window.initialQuery = `{{.Query}}`;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.addEventListener('htmx:afterSwap', function(event) {
+            // Only handle sessions query form
+            if (event.detail.target.id === 'sessions-table') {
+                const queryInput = document.querySelector('#query-value');
+                if (queryInput) {
+                    const queryValue = queryInput.value;
+                    const url = new URL(window.location);
+                    if (queryValue && queryValue.trim() !== '') {
+                        url.searchParams.set('query', queryValue);
+                    } else {
+                        url.searchParams.delete('query');
+                    }
+                    window.history.pushState({}, '', url);
+                }
+            }
+        });
+    });
 </script>
 {{end}}
 
