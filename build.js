@@ -30,6 +30,9 @@ const buildOptions = {
     define: {
         "process.env.NODE_ENV": '"production"',
     },
+    loader: {
+        ".svg": "text",
+    },
 };
 
 async function build() {
