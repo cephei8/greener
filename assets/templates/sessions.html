@@ -63,9 +63,18 @@
     window.initialQuery = `{{.Query}}`;
 
     document.addEventListener('DOMContentLoaded', function() {
+        const queryError = document.getElementById('query-error');
+        if (queryError) {
+            queryError.textContent = '';
+        }
+
         document.body.addEventListener('htmx:afterSwap', function(event) {
-            // Only handle sessions query form
             if (event.detail.target.id === 'sessions-table') {
+                const queryError = document.getElementById('query-error');
+                if (queryError) {
+                    queryError.textContent = '';
+                }
+
                 const queryInput = document.querySelector('#query-value');
                 if (queryInput) {
                     const queryValue = queryInput.value;
