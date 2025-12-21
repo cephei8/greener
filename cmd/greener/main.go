@@ -22,6 +22,7 @@ import (
 type Config struct {
 	DatabaseURL string `env:"GREENER_DATABASE_URL"`
 	AuthSecret  string `env:"GREENER_AUTH_SECRET"`
+	Port        int    `env:"GREENER_PORT" envDefault:"8080"`
 	Verbose     bool   `env:"GREENER_VERBOSE_OUTPUT"`
 }
 
@@ -45,6 +46,7 @@ func main() {
 
 	flag.StringVar(&cfg.DatabaseURL, "db-url", cfg.DatabaseURL, "Database URL")
 	flag.StringVar(&cfg.AuthSecret, "auth-secret", cfg.AuthSecret, "Authentication secret key")
+	flag.IntVar(&cfg.Port, "port", cfg.Port, "Port to listen on")
 	flag.BoolVar(&cfg.Verbose, "verbose", cfg.Verbose, "Enable verbose output")
 	flag.Parse()
 
@@ -146,5 +148,5 @@ func main() {
 	apiV1Ingress.POST("/sessions", ingressHandler.CreateSession)
 	apiV1Ingress.POST("/testcases", ingressHandler.CreateTestcases)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", cfg.Port)))
 }
