@@ -12,6 +12,7 @@
     "tailwindcss": "^3.4.0"
   },
   "dependencies": {
+    "heroicons": "^2.2.0",
     "htmx-ext-response-targets": "^2.0.4",
     "htmx.org": "^2.0.3",
     "prismjs": "^1.29.0"
