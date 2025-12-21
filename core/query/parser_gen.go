@@ -10,9 +10,12 @@ import __yyfmt__ "fmt"
 import (
 	"fmt"
 	"github.com/google/uuid"
+	"time"
 )
 
-//line query.y:11
+const dateFormat = "2006/01/02 15:04:05"
+
+//line query.y:14
 type yySymType struct {
 	yys                 int
 	SelectQuery         SelectQuery
@@ -26,6 +29,7 @@ type yySymType struct {
 	GroupToken          GroupToken
 	GroupTokens         []GroupToken
 	Number              int
+	Query               Query
 }
 
 const STRING = 57346
@@ -51,6 +55,8 @@ const GROUP_BY = 57365
 const GROUP = 57366
 const OFFSET = 57367
 const LIMIT = 57368
+const START_DATE = 57369
+const END_DATE = 57370
 
 var yyToknames = [...]string{
 	"$end",
@@ -79,6 +85,8 @@ var yyToknames = [...]string{
 	"GROUP",
 	"OFFSET",
 	"LIMIT",
+	"START_DATE",
+	"END_DATE",
 }
 
 var yyStatenames = [...]string{}
@@ -87,7 +95,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line query.y:536
+//line query.y:358
 
 //line yacctab:1
 var yyExca = [...]int8{
@@ -98,98 +106,69 @@ var yyExca = [...]int8{
 
 const yyPrivate = 57344
 
-const yyLast = 147
+const yyLast = 74
 
-var yyAct = [...]uint8{
-	59, 34, 18, 19, 27, 49, 50, 11, 12, 13,
-	14, 15, 16, 17, 37, 38, 39, 40, 41, 42,
-	18, 19, 28, 29, 6, 11, 12, 13, 14, 15,
-	16, 17, 7, 121, 2, 3, 7, 27, 22, 23,
-	27, 30, 31, 77, 78, 69, 56, 57, 115, 107,
-	98, 52, 90, 71, 25, 122, 116, 108, 99, 91,
-	32, 72, 61, 112, 131, 111, 85, 60, 84, 79,
-	33, 44, 35, 36, 130, 127, 126, 120, 119, 51,
-	114, 113, 106, 105, 95, 94, 102, 89, 88, 83,
-	82, 76, 75, 55, 54, 53, 48, 47, 21, 20,
-	135, 134, 133, 132, 129, 128, 125, 124, 118, 117,
-	110, 109, 104, 103, 101, 100, 93, 92, 81, 80,
-	74, 73, 46, 45, 5, 123, 97, 87, 86, 24,
-	70, 68, 67, 66, 65, 64, 63, 62, 43, 96,
-	58, 26, 4, 10, 9, 8, 1,
+var yyAct = [...]int8{
+	62, 21, 38, 39, 32, 33, 34, 35, 65, 54,
+	4, 24, 25, 26, 27, 28, 29, 15, 16, 31,
+	19, 20, 8, 9, 10, 11, 12, 13, 14, 40,
+	64, 73, 48, 72, 67, 63, 66, 22, 23, 55,
+	53, 52, 51, 50, 58, 57, 74, 70, 68, 60,
+	59, 56, 49, 47, 46, 45, 44, 43, 42, 41,
+	30, 17, 2, 1, 69, 61, 37, 36, 71, 18,
+	3, 7, 6, 5,
 }
 
 var yyPact = [...]int16{
-	9, -1000, 92, 91, 13, 16, -1000, 56, -1000, -1000,
-	-1000, 65, 65, 65, 65, 65, 65, 65, 134, 60,
-	117, 116, 90, 89, -20, -1000, -9, 88, -1000, -1000,
-	87, 86, 21, 51, 133, -1000, -1000, 132, 131, 130,
-	129, 128, 127, 65, 126, 27, 36, 115, 114, 85,
-	84, 18, -1000, 55, 113, 112, 83, 82, 53, -1000,
-	-1000, 124, -1000, -1000, -1000, -1000, -1000, -1000, -1000, 123,
-	-1000, 81, 80, 26, 34, 111, 110, 78, 77, 122,
-	24, 33, 109, 108, -1000, 51, -1000, -1000, 107, 106,
-	76, 75, 23, 32, 105, 104, 50, -1000, 74, 73,
-	22, 31, -1000, -1000, -1000, 103, 102, 71, 70, 7,
-	30, -1000, 121, 101, 100, 69, 68, -1000, -1000, 99,
-	98, 67, 57, -1000, -1000, -1000, 97, 96, -1000, -1000,
-	95, 94, -1000, -1000, -1000, -1000,
+	6, -1000, -1000, 11, -1000, -1000, -1000, -1000, 30, 30,
+	30, 30, 30, 30, 30, 56, 8, -21, 6, -1000,
+	-1000, 55, -1000, -1000, 54, 53, 52, 51, 50, 49,
+	30, 48, 36, 35, 34, 33, -1000, -1000, -5, 32,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, 47, -1000,
+	39, 38, 46, 45, 19, -6, -1000, -1000, -1000, -1000,
+	-1000, 21, -1000, -1000, 44, 43, -1000, 19, -1000, 18,
+	-1000, -1000, -1000, 42, -1000,
 }
 
-var yyPgo = [...]uint8{
-	0, 146, 24, 145, 144, 143, 142, 141, 1, 124,
-	54, 0, 140, 139,
+var yyPgo = [...]int8{
+	0, 10, 73, 72, 71, 70, 69, 1, 67, 66,
+	0, 65, 64, 63, 62, 61,
 }
 
 var yyR1 = [...]int8{
-	0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 6, 6, 7, 7, 2, 2, 2, 3,
-	3, 3, 3, 3, 3, 3, 4, 4, 5, 8,
-	8, 9, 12, 12, 11, 11, 10, 13, 13,
+	0, 13, 14, 14, 15, 15, 15, 15, 15, 15,
+	15, 5, 5, 6, 6, 1, 1, 1, 2, 2,
+	2, 2, 2, 2, 2, 3, 3, 3, 4, 7,
+	7, 8, 9, 11, 11, 10, 10, 12, 12,
 }
 
 var yyR2 = [...]int8{
-	0, 0, 3, 3, 6, 6, 1, 4, 4, 7,
-	7, 1, 4, 4, 7, 7, 2, 5, 5, 8,
-	8, 2, 5, 5, 8, 8, 3, 6, 6, 9,
-	9, 2, 1, 3, 1, 1, 1, 1, 1, 3,
-	3, 3, 3, 3, 3, 3, 2, 4, 3, 1,
-	1, 4, 1, 3, 1, 2, 5, 1, 3,
+	0, 2, 0, 1, 0, 4, 4, 4, 4, 2,
+	2, 1, 3, 1, 1, 1, 1, 1, 3, 3,
+	3, 3, 3, 3, 3, 4, 3, 2, 3, 1,
+	1, 4, 5, 1, 3, 1, 2, 1, 3,
 }
 
 var yyChk = [...]int16{
-	-1000, -1, 25, 26, -6, -9, -2, 23, -3, -4,
-	-5, 16, 17, 18, 19, 20, 21, 22, 11, 12,
-	7, 7, 25, 26, -9, -10, -7, 24, 9, 10,
-	25, 26, -10, 14, -8, 7, 8, -8, -8, -8,
-	-8, -8, -8, 4, 11, 6, 6, 7, 7, 25,
-	26, -10, -2, 7, 7, 7, 25, 26, -12, -11,
-	16, 11, 4, 4, 4, 4, 4, 4, 4, -8,
-	4, 26, 25, 6, 6, 7, 7, 25, 26, 14,
-	6, 6, 7, 7, 15, 13, 4, 4, 7, 7,
-	26, 25, 6, 6, 7, 7, -13, 4, 26, 25,
-	6, 6, -11, 6, 6, 7, 7, 26, 25, 6,
-	6, 15, 13, 7, 7, 26, 25, 6, 6, 7,
-	7, 26, 25, 4, 6, 6, 7, 7, 6, 6,
-	7, 7, 6, 6, 6, 6,
+	-1000, -13, -14, -5, -1, -2, -3, -4, 16, 17,
+	18, 19, 20, 21, 22, 11, 12, -15, -6, 9,
+	10, -7, 7, 8, -7, -7, -7, -7, -7, -7,
+	4, 11, 25, 26, 27, 28, -8, -9, 23, 24,
+	-1, 4, 4, 4, 4, 4, 4, 4, -7, 4,
+	7, 7, 7, 7, 14, 7, 4, 6, 6, 4,
+	4, -11, -10, 16, 11, 14, 15, 13, 4, -12,
+	4, -10, 15, 13, 4,
 }
 
 var yyDef = [...]int8{
-	1, -2, 0, 0, 6, 11, 32, 0, 36, 37,
-	38, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 21, 31, 0, 0, 34, 35,
-	0, 0, 16, 0, 0, 49, 50, 0, 0, 0,
-	0, 0, 0, 46, 0, 2, 3, 0, 0, 0,
-	0, 26, 33, 0, 0, 0, 0, 0, 0, 52,
-	54, 0, 39, 40, 41, 42, 43, 44, 45, 0,
-	48, 0, 0, 7, 8, 0, 0, 0, 0, 0,
-	12, 13, 0, 0, 51, 0, 55, 47, 0, 0,
-	0, 0, 22, 23, 0, 0, 0, 57, 0, 0,
-	17, 18, 53, 4, 5, 0, 0, 0, 0, 27,
-	28, 56, 0, 0, 0, 0, 0, 9, 10, 0,
-	0, 0, 0, 58, 14, 15, 0, 0, 24, 25,
-	0, 0, 19, 20, 29, 30,
+	2, -2, 4, 3, 11, 15, 16, 17, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 1, 0, 13,
+	14, 0, 29, 30, 0, 0, 0, 0, 0, 0,
+	27, 0, 0, 0, 0, 0, 9, 10, 0, 0,
+	12, 18, 19, 20, 21, 22, 23, 24, 26, 28,
+	0, 0, 0, 0, 0, 0, 25, 5, 6, 7,
+	8, 0, 33, 35, 0, 0, 31, 0, 36, 0,
+	37, 34, 32, 0, 38,
 }
 
 var yyTok1 = [...]int8{
@@ -199,7 +178,7 @@ var yyTok1 = [...]int8{
 var yyTok2 = [...]int8{
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-	22, 23, 24, 25, 26,
+	22, 23, 24, 25, 26, 27, 28,
 }
 
 var yyTok3 = [...]int8{
@@ -544,403 +523,168 @@ yydefault:
 	switch yynt {
 
 	case 1:
-		yyDollar = yyS[yypt-0 : yypt+1]
-//line query.y:45
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line query.y:51
 		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: CompoundSelectQuery{Parts: []CompoundSelectQueryPart{
-					CompoundSelectQueryPart{Operator: OpAnd, Query: EmptySelectQuery{}},
-				}},
+			yyVAL.Query = yyDollar[1].Query
+			if yyDollar[2].Query.GroupQuery != nil {
+				yyVAL.Query.GroupQuery = yyDollar[2].Query.GroupQuery
 			}
+			if yyDollar[2].Query.GroupSelector != nil {
+				if yyDollar[2].Query.GroupQuery == nil {
+					yylex.Error("group selector requires group_by clause")
+					return 1
+				}
+				yyVAL.Query.GroupSelector = yyDollar[2].Query.GroupSelector
+			}
+			if yyDollar[2].Query.Offset != 0 {
+				yyVAL.Query.Offset = yyDollar[2].Query.Offset
+			}
+			if yyDollar[2].Query.Limit != 0 {
+				yyVAL.Query.Limit = yyDollar[2].Query.Limit
+			}
+			if yyDollar[2].Query.StartDate != nil {
+				yyVAL.Query.StartDate = yyDollar[2].Query.StartDate
+			}
+			if yyDollar[2].Query.EndDate != nil {
+				yyVAL.Query.EndDate = yyDollar[2].Query.EndDate
+			}
+			yylex.(*queryLexer).result = yyVAL.Query
 		}
 	case 2:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line query.y:53
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line query.y:81
 		{
-			yylex.(*queryLexer).result = Query{
+			yyVAL.Query = Query{
 				SelectQuery: CompoundSelectQuery{Parts: []CompoundSelectQueryPart{
 					CompoundSelectQueryPart{Operator: OpAnd, Query: EmptySelectQuery{}},
 				}},
-				Offset: yyDollar[3].Number,
 			}
 		}
 	case 3:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line query.y:62
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line query.y:89
 		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: CompoundSelectQuery{Parts: []CompoundSelectQueryPart{
-					CompoundSelectQueryPart{Operator: OpAnd, Query: EmptySelectQuery{}},
-				}},
-				Limit: yyDollar[3].Number,
+			yyVAL.Query = Query{
+				SelectQuery: yyDollar[1].CompoundSelectQuery,
 			}
 		}
 	case 4:
-		yyDollar = yyS[yypt-6 : yypt+1]
-//line query.y:71
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line query.y:98
 		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: CompoundSelectQuery{Parts: []CompoundSelectQueryPart{
-					CompoundSelectQueryPart{Operator: OpAnd, Query: EmptySelectQuery{}},
-				}},
-				Offset: yyDollar[3].Number,
-				Limit:  yyDollar[6].Number,
-			}
+			yyVAL.Query = Query{}
 		}
 	case 5:
-		yyDollar = yyS[yypt-6 : yypt+1]
-//line query.y:81
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line query.y:102
 		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: CompoundSelectQuery{Parts: []CompoundSelectQueryPart{
-					CompoundSelectQueryPart{Operator: OpAnd, Query: EmptySelectQuery{}},
-				}},
-				Offset: yyDollar[6].Number,
-				Limit:  yyDollar[3].Number,
-			}
+			yyVAL.Query = yyDollar[1].Query
+			yyVAL.Query.Offset = yyDollar[4].Number
 		}
 	case 6:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line query.y:91
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line query.y:107
 		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: yyDollar[1].CompoundSelectQuery,
-			}
+			yyVAL.Query = yyDollar[1].Query
+			yyVAL.Query.Limit = yyDollar[4].Number
 		}
 	case 7:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line query.y:97
+//line query.y:112
 		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: yyDollar[1].CompoundSelectQuery,
-				Offset:      yyDollar[4].Number,
+			startDate, err := time.Parse(dateFormat, yyDollar[4].String)
+			if err != nil {
+				yylex.Error(fmt.Sprintf("invalid start_date format (expected YYYY/MM/DD HH:MM:SS): %s", yyDollar[4].String))
+				return 1
 			}
+			yyVAL.Query = yyDollar[1].Query
+			yyVAL.Query.StartDate = &startDate
 		}
 	case 8:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line query.y:104
+//line query.y:122
 		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: yyDollar[1].CompoundSelectQuery,
-				Limit:       yyDollar[4].Number,
+			endDate, err := time.Parse(dateFormat, yyDollar[4].String)
+			if err != nil {
+				yylex.Error(fmt.Sprintf("invalid end_date format (expected YYYY/MM/DD HH:MM:SS): %s", yyDollar[4].String))
+				return 1
 			}
+			yyVAL.Query = yyDollar[1].Query
+			yyVAL.Query.EndDate = &endDate
 		}
 	case 9:
-		yyDollar = yyS[yypt-7 : yypt+1]
-//line query.y:111
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line query.y:132
 		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: yyDollar[1].CompoundSelectQuery,
-				Offset:      yyDollar[4].Number,
-				Limit:       yyDollar[7].Number,
-			}
+			yyVAL.Query = yyDollar[1].Query
+			gq := yyDollar[2].GroupQuery
+			yyVAL.Query.GroupQuery = &gq
 		}
 	case 10:
-		yyDollar = yyS[yypt-7 : yypt+1]
-//line query.y:119
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line query.y:138
 		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: yyDollar[1].CompoundSelectQuery,
-				Offset:      yyDollar[7].Number,
-				Limit:       yyDollar[4].Number,
-			}
+			yyVAL.Query = yyDollar[1].Query
+			yyVAL.Query.GroupSelector = yyDollar[2].GroupSelector
 		}
 	case 11:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line query.y:127
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: CompoundSelectQuery{Parts: []CompoundSelectQueryPart{
-					CompoundSelectQueryPart{Operator: OpAnd, Query: EmptySelectQuery{}},
-				}},
-				GroupQuery: &yyDollar[1].GroupQuery,
-			}
-		}
-	case 12:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line query.y:136
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: CompoundSelectQuery{Parts: []CompoundSelectQueryPart{
-					CompoundSelectQueryPart{Operator: OpAnd, Query: EmptySelectQuery{}},
-				}},
-				GroupQuery: &yyDollar[1].GroupQuery,
-				Offset:     yyDollar[4].Number,
-			}
-		}
-	case 13:
-		yyDollar = yyS[yypt-4 : yypt+1]
 //line query.y:146
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: CompoundSelectQuery{Parts: []CompoundSelectQueryPart{
-					CompoundSelectQueryPart{Operator: OpAnd, Query: EmptySelectQuery{}},
-				}},
-				GroupQuery: &yyDollar[1].GroupQuery,
-				Limit:      yyDollar[4].Number,
-			}
-		}
-	case 14:
-		yyDollar = yyS[yypt-7 : yypt+1]
-//line query.y:156
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: CompoundSelectQuery{Parts: []CompoundSelectQueryPart{
-					CompoundSelectQueryPart{Operator: OpAnd, Query: EmptySelectQuery{}},
-				}},
-				GroupQuery: &yyDollar[1].GroupQuery,
-				Offset:     yyDollar[4].Number,
-				Limit:      yyDollar[7].Number,
-			}
-		}
-	case 15:
-		yyDollar = yyS[yypt-7 : yypt+1]
-//line query.y:167
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: CompoundSelectQuery{Parts: []CompoundSelectQueryPart{
-					CompoundSelectQueryPart{Operator: OpAnd, Query: EmptySelectQuery{}},
-				}},
-				GroupQuery: &yyDollar[1].GroupQuery,
-				Offset:     yyDollar[7].Number,
-				Limit:      yyDollar[4].Number,
-			}
-		}
-	case 16:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line query.y:178
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: CompoundSelectQuery{Parts: []CompoundSelectQueryPart{
-					CompoundSelectQueryPart{Operator: OpAnd, Query: EmptySelectQuery{}},
-				}},
-				GroupQuery:    &yyDollar[1].GroupQuery,
-				GroupSelector: yyDollar[2].GroupSelector,
-			}
-		}
-	case 17:
-		yyDollar = yyS[yypt-5 : yypt+1]
-//line query.y:188
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: CompoundSelectQuery{Parts: []CompoundSelectQueryPart{
-					CompoundSelectQueryPart{Operator: OpAnd, Query: EmptySelectQuery{}},
-				}},
-				GroupQuery:    &yyDollar[1].GroupQuery,
-				GroupSelector: yyDollar[2].GroupSelector,
-				Offset:        yyDollar[5].Number,
-			}
-		}
-	case 18:
-		yyDollar = yyS[yypt-5 : yypt+1]
-//line query.y:199
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: CompoundSelectQuery{Parts: []CompoundSelectQueryPart{
-					CompoundSelectQueryPart{Operator: OpAnd, Query: EmptySelectQuery{}},
-				}},
-				GroupQuery:    &yyDollar[1].GroupQuery,
-				GroupSelector: yyDollar[2].GroupSelector,
-				Limit:         yyDollar[5].Number,
-			}
-		}
-	case 19:
-		yyDollar = yyS[yypt-8 : yypt+1]
-//line query.y:210
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: CompoundSelectQuery{Parts: []CompoundSelectQueryPart{
-					CompoundSelectQueryPart{Operator: OpAnd, Query: EmptySelectQuery{}},
-				}},
-				GroupQuery:    &yyDollar[1].GroupQuery,
-				GroupSelector: yyDollar[2].GroupSelector,
-				Offset:        yyDollar[5].Number,
-				Limit:         yyDollar[8].Number,
-			}
-		}
-	case 20:
-		yyDollar = yyS[yypt-8 : yypt+1]
-//line query.y:222
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: CompoundSelectQuery{Parts: []CompoundSelectQueryPart{
-					CompoundSelectQueryPart{Operator: OpAnd, Query: EmptySelectQuery{}},
-				}},
-				GroupQuery:    &yyDollar[1].GroupQuery,
-				GroupSelector: yyDollar[2].GroupSelector,
-				Offset:        yyDollar[8].Number,
-				Limit:         yyDollar[5].Number,
-			}
-		}
-	case 21:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line query.y:234
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: yyDollar[1].CompoundSelectQuery,
-				GroupQuery:  &yyDollar[2].GroupQuery,
-			}
-		}
-	case 22:
-		yyDollar = yyS[yypt-5 : yypt+1]
-//line query.y:241
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: yyDollar[1].CompoundSelectQuery,
-				GroupQuery:  &yyDollar[2].GroupQuery,
-				Offset:      yyDollar[5].Number,
-			}
-		}
-	case 23:
-		yyDollar = yyS[yypt-5 : yypt+1]
-//line query.y:249
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: yyDollar[1].CompoundSelectQuery,
-				GroupQuery:  &yyDollar[2].GroupQuery,
-				Limit:       yyDollar[5].Number,
-			}
-		}
-	case 24:
-		yyDollar = yyS[yypt-8 : yypt+1]
-//line query.y:257
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: yyDollar[1].CompoundSelectQuery,
-				GroupQuery:  &yyDollar[2].GroupQuery,
-				Offset:      yyDollar[5].Number,
-				Limit:       yyDollar[8].Number,
-			}
-		}
-	case 25:
-		yyDollar = yyS[yypt-8 : yypt+1]
-//line query.y:266
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery: yyDollar[1].CompoundSelectQuery,
-				GroupQuery:  &yyDollar[2].GroupQuery,
-				Offset:      yyDollar[8].Number,
-				Limit:       yyDollar[5].Number,
-			}
-		}
-	case 26:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line query.y:275
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery:   yyDollar[1].CompoundSelectQuery,
-				GroupQuery:    &yyDollar[2].GroupQuery,
-				GroupSelector: yyDollar[3].GroupSelector,
-			}
-		}
-	case 27:
-		yyDollar = yyS[yypt-6 : yypt+1]
-//line query.y:283
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery:   yyDollar[1].CompoundSelectQuery,
-				GroupQuery:    &yyDollar[2].GroupQuery,
-				GroupSelector: yyDollar[3].GroupSelector,
-				Offset:        yyDollar[6].Number,
-			}
-		}
-	case 28:
-		yyDollar = yyS[yypt-6 : yypt+1]
-//line query.y:292
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery:   yyDollar[1].CompoundSelectQuery,
-				GroupQuery:    &yyDollar[2].GroupQuery,
-				GroupSelector: yyDollar[3].GroupSelector,
-				Limit:         yyDollar[6].Number,
-			}
-		}
-	case 29:
-		yyDollar = yyS[yypt-9 : yypt+1]
-//line query.y:301
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery:   yyDollar[1].CompoundSelectQuery,
-				GroupQuery:    &yyDollar[2].GroupQuery,
-				GroupSelector: yyDollar[3].GroupSelector,
-				Offset:        yyDollar[6].Number,
-				Limit:         yyDollar[9].Number,
-			}
-		}
-	case 30:
-		yyDollar = yyS[yypt-9 : yypt+1]
-//line query.y:311
-		{
-			yylex.(*queryLexer).result = Query{
-				SelectQuery:   yyDollar[1].CompoundSelectQuery,
-				GroupQuery:    &yyDollar[2].GroupQuery,
-				GroupSelector: yyDollar[3].GroupSelector,
-				Offset:        yyDollar[9].Number,
-				Limit:         yyDollar[6].Number,
-			}
-		}
-	case 31:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line query.y:321
-		{
-			yylex.Error("group specification requires group_by clause")
-			return 1
-		}
-	case 32:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line query.y:329
 		{
 			yyVAL.CompoundSelectQuery = CompoundSelectQuery{
 				Parts: []CompoundSelectQueryPart{
-					CompoundSelectQueryPart{Operator: OpAnd, Query: yyDollar[1].SelectQuery},
+					{Operator: OpAnd, Query: yyDollar[1].SelectQuery},
 				},
 			}
 		}
-	case 33:
+	case 12:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line query.y:337
+//line query.y:154
 		{
-
-			yyDollar[1].CompoundSelectQuery.Parts = append(yyDollar[1].CompoundSelectQuery.Parts, CompoundSelectQueryPart{Operator: yyDollar[2].LogicalOperator, Query: yyDollar[3].SelectQuery})
 			yyVAL.CompoundSelectQuery = yyDollar[1].CompoundSelectQuery
+			yyVAL.CompoundSelectQuery.Parts = append(yyVAL.CompoundSelectQuery.Parts, CompoundSelectQueryPart{
+				Operator: yyDollar[2].LogicalOperator,
+				Query:    yyDollar[3].SelectQuery,
+			})
 		}
-	case 34:
+	case 13:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line query.y:346
+//line query.y:165
 		{
 			yyVAL.LogicalOperator = OpAnd
 		}
-	case 35:
+	case 14:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line query.y:350
+//line query.y:169
 		{
 			yyVAL.LogicalOperator = OpOr
 		}
-	case 36:
+	case 15:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line query.y:357
+//line query.y:176
 		{
 			yyVAL.SelectQuery = yyDollar[1].SelectQuery
 		}
-	case 37:
+	case 16:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line query.y:361
+//line query.y:180
 		{
 			yyVAL.SelectQuery = yyDollar[1].SelectQuery
 		}
-	case 38:
+	case 17:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line query.y:365
+//line query.y:184
 		{
 			yyVAL.SelectQuery = yyDollar[1].SelectQuery
 		}
-	case 39:
+	case 18:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line query.y:372
+//line query.y:191
 		{
 			sessionId, err := uuid.Parse(yyDollar[3].String)
 			if err != nil {
-				yylex.Error(fmt.Sprintf("invalid UUID: %s", yyDollar[3].String))
+				yylex.Error(fmt.Sprintf("invalid session_id (expected UUID): %s", yyDollar[3].String))
 				return 1
 			}
 			yyVAL.SelectQuery = SessionSelectQuery{
@@ -948,13 +692,13 @@ yydefault:
 				Operator:  yyDollar[2].EqualityOperator,
 			}
 		}
-	case 40:
+	case 19:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line query.y:384
+//line query.y:203
 		{
 			id, err := uuid.Parse(yyDollar[3].String)
 			if err != nil {
-				yylex.Error(fmt.Sprintf("invalid UUID: %s", yyDollar[3].String))
+				yylex.Error(fmt.Sprintf("invalid id (expected UUID): %s", yyDollar[3].String))
 				return 1
 			}
 			yyVAL.SelectQuery = IdSelectQuery{
@@ -962,45 +706,45 @@ yydefault:
 				Operator: yyDollar[2].EqualityOperator,
 			}
 		}
-	case 41:
+	case 20:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line query.y:396
+//line query.y:215
 		{
 			yyVAL.SelectQuery = NameSelectQuery{
 				Name:     yyDollar[3].String,
 				Operator: yyDollar[2].EqualityOperator,
 			}
 		}
-	case 42:
+	case 21:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line query.y:403
+//line query.y:222
 		{
 			yyVAL.SelectQuery = ClassnameSelectQuery{
 				Classname: yyDollar[3].String,
 				Operator:  yyDollar[2].EqualityOperator,
 			}
 		}
-	case 43:
+	case 22:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line query.y:410
+//line query.y:229
 		{
 			yyVAL.SelectQuery = TestsuiteSelectQuery{
 				Testsuite: yyDollar[3].String,
 				Operator:  yyDollar[2].EqualityOperator,
 			}
 		}
-	case 44:
+	case 23:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line query.y:417
+//line query.y:236
 		{
 			yyVAL.SelectQuery = FileSelectQuery{
 				File:     yyDollar[3].String,
 				Operator: yyDollar[2].EqualityOperator,
 			}
 		}
-	case 45:
+	case 24:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line query.y:424
+//line query.y:243
 		{
 			validStatuses := []TestcaseStatus{StatusPass, StatusFail, StatusError, StatusSkip}
 			var status TestcaseStatus
@@ -1013,7 +757,7 @@ yydefault:
 				}
 			}
 			if !isValid {
-				yylex.Error(fmt.Sprintf("invalid status: %s", yyDollar[3].String))
+				yylex.Error(fmt.Sprintf("invalid status: %s (expected: pass, fail, error, skip)", yyDollar[3].String))
 				return 1
 			}
 			yyVAL.SelectQuery = StatusSelectQuery{
@@ -1021,18 +765,9 @@ yydefault:
 				Operator: yyDollar[2].EqualityOperator,
 			}
 		}
-	case 46:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line query.y:448
-		{
-			yyVAL.SelectQuery = TagSelectQuery{
-				Tag:      yyDollar[2].String,
-				Operator: OpEq,
-			}
-		}
-	case 47:
+	case 25:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line query.y:455
+//line query.y:267
 		{
 			yyVAL.SelectQuery = TagValueSelectQuery{
 				Tag:      yyDollar[2].String,
@@ -1040,76 +775,90 @@ yydefault:
 				Operator: yyDollar[3].EqualityOperator,
 			}
 		}
-	case 48:
+	case 26:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line query.y:466
+//line query.y:275
+		{
+			yylex.Error(fmt.Sprintf("expected value after equality operator for tag %s", yyDollar[2].String))
+			return 1
+		}
+	case 27:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line query.y:280
+		{
+			yyVAL.SelectQuery = TagSelectQuery{
+				Tag:      yyDollar[2].String,
+				Operator: OpEq,
+			}
+		}
+	case 28:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line query.y:290
 		{
 			yyVAL.SelectQuery = TagSelectQuery{
 				Tag:      yyDollar[3].String,
 				Operator: OpNEq,
 			}
 		}
-	case 49:
+	case 29:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line query.y:476
+//line query.y:300
 		{
 			yyVAL.EqualityOperator = OpEq
 		}
-	case 50:
+	case 30:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line query.y:480
+//line query.y:304
 		{
 			yyVAL.EqualityOperator = OpNEq
 		}
-	case 51:
+	case 31:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line query.y:487
+//line query.y:311
 		{
 			yyVAL.GroupQuery = GroupQuery{
 				Tokens: yyDollar[3].GroupTokens,
 			}
 		}
-	case 52:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line query.y:496
-		{
-			yyVAL.GroupTokens = []GroupToken{yyDollar[1].GroupToken}
-		}
-	case 53:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line query.y:500
-		{
-			yyVAL.GroupTokens = append(yyDollar[1].GroupTokens, yyDollar[3].GroupToken)
-		}
-	case 54:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line query.y:507
-		{
-			yyVAL.GroupToken = SessionGroupToken{}
-		}
-	case 55:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line query.y:511
-		{
-			yyVAL.GroupToken = TagGroupToken{
-				Tag: yyDollar[2].String,
-			}
-		}
-	case 56:
+	case 32:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line query.y:520
+//line query.y:320
 		{
 			yyVAL.GroupSelector = yyDollar[4].Strings
 		}
-	case 57:
+	case 33:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line query.y:527
+//line query.y:327
+		{
+			yyVAL.GroupTokens = []GroupToken{yyDollar[1].GroupToken}
+		}
+	case 34:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line query.y:331
+		{
+			yyVAL.GroupTokens = append(yyDollar[1].GroupTokens, yyDollar[3].GroupToken)
+		}
+	case 35:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line query.y:338
+		{
+			yyVAL.GroupToken = SessionGroupToken{}
+		}
+	case 36:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line query.y:342
+		{
+			yyVAL.GroupToken = TagGroupToken{Tag: yyDollar[2].String}
+		}
+	case 37:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line query.y:349
 		{
 			yyVAL.Strings = []string{yyDollar[1].String}
 		}
-	case 58:
+	case 38:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line query.y:531
+//line query.y:353
 		{
 			yyVAL.Strings = append(yyDollar[1].Strings, yyDollar[3].String)
 		}

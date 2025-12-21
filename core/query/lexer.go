@@ -153,6 +153,10 @@ func (l *queryLexer) Lex(lval *yySymType) int {
 				return OFFSET
 			case "limit":
 				return LIMIT
+			case "start_date":
+				return START_DATE
+			case "end_date":
+				return END_DATE
 			default:
 				l.err = fmt.Errorf("unknown identifier: %s", ident)
 				return 0

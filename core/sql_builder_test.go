@@ -433,6 +433,10 @@ func stringPtr(s string) *string {
 	return &s
 }
 
+func timePtr(t time.Time) *time.Time {
+	return &t
+}
+
 func (s *BaseSuite) TestTestcases() {
 	type testcaseRow struct {
 		ID        model_db.BinaryUUID     `bun:"id"`
@@ -886,6 +890,95 @@ func (s *BaseSuite) TestTestcases() {
 			expectedIds: []uuid.UUID{s.testcase6Id, s.testcase5Id, s.testcase1Id},
 		},
 	}
+
+	farPast := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
+	farFuture := time.Date(2099, 12, 31, 23, 59, 59, 0, time.UTC)
+
+	dateTests := []struct {
+		name        string
+		queryAST    query.Query
+		expectedIds []uuid.UUID
+	}{
+		{
+			name: "filter by start_date - all testcases after far past",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				StartDate: &farPast,
+			},
+			expectedIds: []uuid.UUID{s.testcase6Id, s.testcase5Id, s.testcase4Id, s.testcase3Id, s.testcase2Id, s.testcase1Id},
+		},
+		{
+			name: "filter by end_date - no testcases before far past",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				EndDate: &farPast,
+			},
+			expectedIds: []uuid.UUID{},
+		},
+		{
+			name: "filter by start_date - no testcases after far future",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				StartDate: &farFuture,
+			},
+			expectedIds: []uuid.UUID{},
+		},
+		{
+			name: "filter by end_date - all testcases before far future",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				EndDate: &farFuture,
+			},
+			expectedIds: []uuid.UUID{s.testcase6Id, s.testcase5Id, s.testcase4Id, s.testcase3Id, s.testcase2Id, s.testcase1Id},
+		},
+		{
+			name: "filter by date range - far past to far future (all testcases)",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				StartDate: &farPast,
+				EndDate:   &farFuture,
+			},
+			expectedIds: []uuid.UUID{s.testcase6Id, s.testcase5Id, s.testcase4Id, s.testcase3Id, s.testcase2Id, s.testcase1Id},
+		},
+		{
+			name: "date filter with status query",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.StatusSelectQuery{
+							Status:   query.StatusPass,
+							Operator: query.OpEq,
+						}},
+					},
+				},
+				StartDate: &farPast,
+				EndDate:   &farFuture,
+			},
+			expectedIds: []uuid.UUID{s.testcase6Id, s.testcase5Id, s.testcase3Id, s.testcase1Id},
+		},
+	}
+
+	tests = append(tests, dateTests...)
 
 	for _, tt := range tests {
 		s.T().Run(tt.name, func(t *testing.T) {
@@ -1457,6 +1550,100 @@ func (s *BaseSuite) TestSessions() {
 		},
 	}
 
+	farPast := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
+	farFuture := time.Date(2099, 12, 31, 23, 59, 59, 0, time.UTC)
+
+	dateTests := []struct {
+		name                    string
+		queryAST                query.Query
+		expectedSessionIds      []uuid.UUID
+		expectedAggregatedStats map[uuid.UUID]model_db.TestcaseStatus
+	}{
+		{
+			name: "filter sessions by start_date - all sessions after far past",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				StartDate: &farPast,
+			},
+			expectedSessionIds: []uuid.UUID{s.session3Id, s.session2Id, s.session1Id},
+			expectedAggregatedStats: map[uuid.UUID]model_db.TestcaseStatus{
+				s.session1Id: model_db.StatusFail,
+				s.session2Id: model_db.StatusError,
+				s.session3Id: model_db.StatusPass,
+			},
+		},
+		{
+			name: "filter sessions by end_date - no sessions before far past",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				EndDate: &farPast,
+			},
+			expectedSessionIds:      []uuid.UUID{},
+			expectedAggregatedStats: map[uuid.UUID]model_db.TestcaseStatus{},
+		},
+		{
+			name: "filter sessions by start_date - no sessions after far future",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				StartDate: &farFuture,
+			},
+			expectedSessionIds:      []uuid.UUID{},
+			expectedAggregatedStats: map[uuid.UUID]model_db.TestcaseStatus{},
+		},
+		{
+			name: "filter sessions by end_date - all sessions before far future",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				EndDate: &farFuture,
+			},
+			expectedSessionIds: []uuid.UUID{s.session3Id, s.session2Id, s.session1Id},
+			expectedAggregatedStats: map[uuid.UUID]model_db.TestcaseStatus{
+				s.session1Id: model_db.StatusFail,
+				s.session2Id: model_db.StatusError,
+				s.session3Id: model_db.StatusPass,
+			},
+		},
+		{
+			name: "date filter with tag query",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.TagValueSelectQuery{
+							Tag:      "env",
+							Value:    "production",
+							Operator: query.OpEq,
+						}},
+					},
+				},
+				StartDate: &farPast,
+				EndDate:   &farFuture,
+			},
+			expectedSessionIds: []uuid.UUID{s.session3Id, s.session1Id},
+			expectedAggregatedStats: map[uuid.UUID]model_db.TestcaseStatus{
+				s.session1Id: model_db.StatusFail,
+				s.session3Id: model_db.StatusPass,
+			},
+		},
+	}
+
+	tests = append(tests, dateTests...)
+
 	for _, tt := range tests {
 		s.T().Run(tt.name, func(t *testing.T) {
 			t.Parallel()
@@ -1916,6 +2103,102 @@ func (s *BaseSuite) TestGroups() {
 			},
 		},
 	}
+
+	farPast := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
+	farFuture := time.Date(2099, 12, 31, 23, 59, 59, 0, time.UTC)
+
+	dateTests := []struct {
+		name           string
+		queryAST       query.Query
+		groupBy        *query.GroupQuery
+		expectedGroups []string
+	}{
+		{
+			name: "group by session with start_date filter - all sessions",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				StartDate: &farPast,
+			},
+			groupBy: &query.GroupQuery{
+				Tokens: []query.GroupToken{
+					query.SessionGroupToken{},
+				},
+			},
+			expectedGroups: []string{
+				fmt.Sprintf("session:%s", s.session1Id),
+				fmt.Sprintf("session:%s", s.session2Id),
+				fmt.Sprintf("session:%s", s.session3Id),
+			},
+		},
+		{
+			name: "group by session with end_date filter - no sessions",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				EndDate: &farPast,
+			},
+			groupBy: &query.GroupQuery{
+				Tokens: []query.GroupToken{
+					query.SessionGroupToken{},
+				},
+			},
+			expectedGroups: []string{},
+		},
+		{
+			name: "group by env with date range filter - all",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				StartDate: &farPast,
+				EndDate:   &farFuture,
+			},
+			groupBy: &query.GroupQuery{
+				Tokens: []query.GroupToken{
+					query.TagGroupToken{Tag: "env"},
+				},
+			},
+			expectedGroups: []string{
+				"env:staging",
+				"env:production",
+			},
+		},
+		{
+			name: "group by env with date filter and status query",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.StatusSelectQuery{
+							Status:   query.StatusPass,
+							Operator: query.OpEq,
+						}},
+					},
+				},
+				StartDate: &farPast,
+				EndDate:   &farFuture,
+			},
+			groupBy: &query.GroupQuery{
+				Tokens: []query.GroupToken{
+					query.TagGroupToken{Tag: "env"},
+				},
+			},
+			expectedGroups: []string{
+				"env:staging",
+				"env:production",
+			},
+		},
+	}
+
+	tests = append(tests, dateTests...)
 
 	for _, tt := range tests {
 		s.T().Run(tt.name, func(t *testing.T) {

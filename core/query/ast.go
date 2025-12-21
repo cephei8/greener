@@ -1,6 +1,8 @@
 package query
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -167,4 +169,6 @@ type Query struct {
 	GroupSelector []string
 	Offset        int
 	Limit         int
+	StartDate     *time.Time
+	EndDate       *time.Time
 }
