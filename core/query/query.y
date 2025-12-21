@@ -19,13 +19,15 @@ import (
 	GroupSelector       []string
 	GroupToken          GroupToken
 	GroupTokens         []GroupToken
+	Number              int
 }
 
 %token <String> STRING IDENTIFIER
+%token <Number> NUMBER
 %token EQUALS NOTEQUALS
 %token AND OR
 %token HASH BANG COMMA LPAREN RPAREN
-%token SESSION_ID ID NAME CLASSNAME TESTSUITE FILE STATUS GROUP_BY GROUP
+%token SESSION_ID ID NAME CLASSNAME TESTSUITE FILE STATUS GROUP_BY GROUP OFFSET LIMIT
 
 %type <SelectQuery> query atomic_query field_query tag_query not_tag_query
 %type <CompoundSelectQuery> compound_query
@@ -47,10 +49,78 @@ query:
             }},
         }
 	}
+	| OFFSET EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
+                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
+            }},
+			Offset: $3,
+        }
+	}
+	| LIMIT EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
+                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
+            }},
+			Limit: $3,
+        }
+	}
+	| OFFSET EQUALS NUMBER LIMIT EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
+                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
+            }},
+			Offset: $3,
+			Limit:  $6,
+        }
+	}
+	| LIMIT EQUALS NUMBER OFFSET EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
+                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
+            }},
+			Offset: $6,
+			Limit:  $3,
+        }
+	}
 	| compound_query
 	{
 		yylex.(*queryLexer).result = Query{
             SelectQuery: $1,
+        }
+	}
+	| compound_query OFFSET EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+            SelectQuery: $1,
+			Offset:      $4,
+        }
+	}
+	| compound_query LIMIT EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+            SelectQuery: $1,
+			Limit:       $4,
+        }
+	}
+	| compound_query OFFSET EQUALS NUMBER LIMIT EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+            SelectQuery: $1,
+			Offset:      $4,
+			Limit:       $7,
+        }
+	}
+	| compound_query LIMIT EQUALS NUMBER OFFSET EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+            SelectQuery: $1,
+			Offset:      $7,
+			Limit:       $4,
         }
 	}
 	| group_query
@@ -60,6 +130,48 @@ query:
                 CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
             }},
 			GroupQuery:  &$1,
+		}
+	}
+	| group_query OFFSET EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
+                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
+            }},
+			GroupQuery: &$1,
+			Offset:     $4,
+		}
+	}
+	| group_query LIMIT EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
+                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
+            }},
+			GroupQuery: &$1,
+			Limit:      $4,
+		}
+	}
+	| group_query OFFSET EQUALS NUMBER LIMIT EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
+                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
+            }},
+			GroupQuery: &$1,
+			Offset:     $4,
+			Limit:      $7,
+		}
+	}
+	| group_query LIMIT EQUALS NUMBER OFFSET EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
+                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
+            }},
+			GroupQuery: &$1,
+			Offset:     $7,
+			Limit:      $4,
 		}
 	}
 	| group_query group_selector
@@ -72,11 +184,91 @@ query:
 			GroupSelector: $2,
 		}
 	}
+	| group_query group_selector OFFSET EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
+                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
+            }},
+			GroupQuery:    &$1,
+			GroupSelector: $2,
+			Offset:        $5,
+		}
+	}
+	| group_query group_selector LIMIT EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
+                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
+            }},
+			GroupQuery:    &$1,
+			GroupSelector: $2,
+			Limit:         $5,
+		}
+	}
+	| group_query group_selector OFFSET EQUALS NUMBER LIMIT EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
+                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
+            }},
+			GroupQuery:    &$1,
+			GroupSelector: $2,
+			Offset:        $5,
+			Limit:         $8,
+		}
+	}
+	| group_query group_selector LIMIT EQUALS NUMBER OFFSET EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
+                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
+            }},
+			GroupQuery:    &$1,
+			GroupSelector: $2,
+			Offset:        $8,
+			Limit:         $5,
+		}
+	}
 	| compound_query group_query
 	{
 		yylex.(*queryLexer).result = Query{
 			SelectQuery: $1,
 			GroupQuery:  &$2,
+		}
+	}
+	| compound_query group_query OFFSET EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+			SelectQuery: $1,
+			GroupQuery:  &$2,
+			Offset:      $5,
+		}
+	}
+	| compound_query group_query LIMIT EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+			SelectQuery: $1,
+			GroupQuery:  &$2,
+			Limit:       $5,
+		}
+	}
+	| compound_query group_query OFFSET EQUALS NUMBER LIMIT EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+			SelectQuery: $1,
+			GroupQuery:  &$2,
+			Offset:      $5,
+			Limit:       $8,
+		}
+	}
+	| compound_query group_query LIMIT EQUALS NUMBER OFFSET EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+			SelectQuery: $1,
+			GroupQuery:  &$2,
+			Offset:      $8,
+			Limit:       $5,
 		}
 	}
 	| compound_query group_query group_selector
@@ -85,6 +277,44 @@ query:
 			SelectQuery:   $1,
 			GroupQuery:    &$2,
 			GroupSelector: $3,
+		}
+	}
+	| compound_query group_query group_selector OFFSET EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+			SelectQuery:   $1,
+			GroupQuery:    &$2,
+			GroupSelector: $3,
+			Offset:        $6,
+		}
+	}
+	| compound_query group_query group_selector LIMIT EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+			SelectQuery:   $1,
+			GroupQuery:    &$2,
+			GroupSelector: $3,
+			Limit:         $6,
+		}
+	}
+	| compound_query group_query group_selector OFFSET EQUALS NUMBER LIMIT EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+			SelectQuery:   $1,
+			GroupQuery:    &$2,
+			GroupSelector: $3,
+			Offset:        $6,
+			Limit:         $9,
+		}
+	}
+	| compound_query group_query group_selector LIMIT EQUALS NUMBER OFFSET EQUALS NUMBER
+	{
+		yylex.(*queryLexer).result = Query{
+			SelectQuery:   $1,
+			GroupQuery:    &$2,
+			GroupSelector: $3,
+			Offset:        $9,
+			Limit:         $6,
 		}
 	}
 	| compound_query group_selector

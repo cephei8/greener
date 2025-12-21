@@ -165,4 +165,6 @@ type Query struct {
 	SelectQuery   CompoundSelectQuery
 	GroupQuery    *GroupQuery
 	GroupSelector []string
+	Offset        int
+	Limit         int
 }

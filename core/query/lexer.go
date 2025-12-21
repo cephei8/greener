@@ -69,6 +69,18 @@ func (l *queryLexer) readIdentifier() string {
 	return l.input[start : l.pos-1]
 }
 
+func (l *queryLexer) readNumber() int {
+	start := l.pos - 1
+	for unicode.IsDigit(l.ch) {
+		l.readChar()
+	}
+	num := 0
+	for _, r := range l.input[start : l.pos-1] {
+		num = num*10 + int(r-'0')
+	}
+	return num
+}
+
 func (l *queryLexer) Lex(lval *yySymType) int {
 	l.skipWhitespace()
 
@@ -137,10 +149,19 @@ func (l *queryLexer) Lex(lval *yySymType) int {
 				return GROUP_BY
 			case "group":
 				return GROUP
+			case "offset":
+				return OFFSET
+			case "limit":
+				return LIMIT
 			default:
 				l.err = fmt.Errorf("unknown identifier: %s", ident)
 				return 0
 			}
+		}
+
+		if unicode.IsDigit(l.ch) {
+			lval.Number = l.readNumber()
+			return NUMBER
 		}
 
 		l.err = fmt.Errorf("unexpected character: %c", l.ch)
