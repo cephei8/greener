@@ -3,8 +3,11 @@ package query
 
 import (
 	"fmt"
+	"time"
 	"github.com/google/uuid"
 )
+
+const dateFormat = "2006/01/02 15:04:05"
 
 %}
 
@@ -20,6 +23,7 @@ import (
 	GroupToken          GroupToken
 	GroupTokens         []GroupToken
 	Number              int
+	Query               Query
 }
 
 %token <String> STRING IDENTIFIER
@@ -27,9 +31,9 @@ import (
 %token EQUALS NOTEQUALS
 %token AND OR
 %token HASH BANG COMMA LPAREN RPAREN
-%token SESSION_ID ID NAME CLASSNAME TESTSUITE FILE STATUS GROUP_BY GROUP OFFSET LIMIT
+%token SESSION_ID ID NAME CLASSNAME TESTSUITE FILE STATUS GROUP_BY GROUP OFFSET LIMIT START_DATE END_DATE
 
-%type <SelectQuery> query atomic_query field_query tag_query not_tag_query
+%type <SelectQuery> atomic_query field_query tag_query not_tag_query
 %type <CompoundSelectQuery> compound_query
 %type <LogicalOperator> logical_op
 %type <EqualityOperator> equality_op
@@ -38,307 +42,122 @@ import (
 %type <GroupToken> group_token
 %type <GroupTokens> group_token_list
 %type <Strings> string_list
+%type <Query> query base_query modifier_list
 
 %%
 
 query:
+	base_query modifier_list
 	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
-                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
-            }},
-        }
+		$$ = $1
+		if $2.GroupQuery != nil {
+			$$.GroupQuery = $2.GroupQuery
+		}
+		if $2.GroupSelector != nil {
+			if $2.GroupQuery == nil {
+				yylex.Error("group selector requires group_by clause")
+				return 1
+			}
+			$$.GroupSelector = $2.GroupSelector
+		}
+		if $2.Offset != 0 {
+			$$.Offset = $2.Offset
+		}
+		if $2.Limit != 0 {
+			$$.Limit = $2.Limit
+		}
+		if $2.StartDate != nil {
+			$$.StartDate = $2.StartDate
+		}
+		if $2.EndDate != nil {
+			$$.EndDate = $2.EndDate
+		}
+		yylex.(*queryLexer).result = $$
 	}
-	| OFFSET EQUALS NUMBER
+	;
+
+base_query:
+	/* empty */
 	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
-                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
-            }},
-			Offset: $3,
-        }
-	}
-	| LIMIT EQUALS NUMBER
-	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
-                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
-            }},
-			Limit: $3,
-        }
-	}
-	| OFFSET EQUALS NUMBER LIMIT EQUALS NUMBER
-	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
-                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
-            }},
-			Offset: $3,
-			Limit:  $6,
-        }
-	}
-	| LIMIT EQUALS NUMBER OFFSET EQUALS NUMBER
-	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
-                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
-            }},
-			Offset: $6,
-			Limit:  $3,
-        }
+		$$ = Query{
+			SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
+				CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
+			}},
+		}
 	}
 	| compound_query
 	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: $1,
-        }
-	}
-	| compound_query OFFSET EQUALS NUMBER
-	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: $1,
-			Offset:      $4,
-        }
-	}
-	| compound_query LIMIT EQUALS NUMBER
-	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: $1,
-			Limit:       $4,
-        }
-	}
-	| compound_query OFFSET EQUALS NUMBER LIMIT EQUALS NUMBER
-	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: $1,
-			Offset:      $4,
-			Limit:       $7,
-        }
-	}
-	| compound_query LIMIT EQUALS NUMBER OFFSET EQUALS NUMBER
-	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: $1,
-			Offset:      $7,
-			Limit:       $4,
-        }
-	}
-	| group_query
-	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
-                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
-            }},
-			GroupQuery:  &$1,
-		}
-	}
-	| group_query OFFSET EQUALS NUMBER
-	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
-                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
-            }},
-			GroupQuery: &$1,
-			Offset:     $4,
-		}
-	}
-	| group_query LIMIT EQUALS NUMBER
-	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
-                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
-            }},
-			GroupQuery: &$1,
-			Limit:      $4,
-		}
-	}
-	| group_query OFFSET EQUALS NUMBER LIMIT EQUALS NUMBER
-	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
-                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
-            }},
-			GroupQuery: &$1,
-			Offset:     $4,
-			Limit:      $7,
-		}
-	}
-	| group_query LIMIT EQUALS NUMBER OFFSET EQUALS NUMBER
-	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
-                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
-            }},
-			GroupQuery: &$1,
-			Offset:     $7,
-			Limit:      $4,
-		}
-	}
-	| group_query group_selector
-	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
-                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
-            }},
-			GroupQuery:    &$1,
-			GroupSelector: $2,
-		}
-	}
-	| group_query group_selector OFFSET EQUALS NUMBER
-	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
-                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
-            }},
-			GroupQuery:    &$1,
-			GroupSelector: $2,
-			Offset:        $5,
-		}
-	}
-	| group_query group_selector LIMIT EQUALS NUMBER
-	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
-                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
-            }},
-			GroupQuery:    &$1,
-			GroupSelector: $2,
-			Limit:         $5,
-		}
-	}
-	| group_query group_selector OFFSET EQUALS NUMBER LIMIT EQUALS NUMBER
-	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
-                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
-            }},
-			GroupQuery:    &$1,
-			GroupSelector: $2,
-			Offset:        $5,
-			Limit:         $8,
-		}
-	}
-	| group_query group_selector LIMIT EQUALS NUMBER OFFSET EQUALS NUMBER
-	{
-		yylex.(*queryLexer).result = Query{
-            SelectQuery: CompoundSelectQuery{ Parts: []CompoundSelectQueryPart{
-                CompoundSelectQueryPart { Operator: OpAnd, Query: EmptySelectQuery{} },
-            }},
-			GroupQuery:    &$1,
-			GroupSelector: $2,
-			Offset:        $8,
-			Limit:         $5,
-		}
-	}
-	| compound_query group_query
-	{
-		yylex.(*queryLexer).result = Query{
+		$$ = Query{
 			SelectQuery: $1,
-			GroupQuery:  &$2,
 		}
 	}
-	| compound_query group_query OFFSET EQUALS NUMBER
+	;
+
+modifier_list:
+	/* empty */
 	{
-		yylex.(*queryLexer).result = Query{
-			SelectQuery: $1,
-			GroupQuery:  &$2,
-			Offset:      $5,
-		}
+		$$ = Query{}
 	}
-	| compound_query group_query LIMIT EQUALS NUMBER
+	| modifier_list OFFSET EQUALS NUMBER
 	{
-		yylex.(*queryLexer).result = Query{
-			SelectQuery: $1,
-			GroupQuery:  &$2,
-			Limit:       $5,
-		}
+		$$ = $1
+		$$.Offset = $4
 	}
-	| compound_query group_query OFFSET EQUALS NUMBER LIMIT EQUALS NUMBER
+	| modifier_list LIMIT EQUALS NUMBER
 	{
-		yylex.(*queryLexer).result = Query{
-			SelectQuery: $1,
-			GroupQuery:  &$2,
-			Offset:      $5,
-			Limit:       $8,
-		}
+		$$ = $1
+		$$.Limit = $4
 	}
-	| compound_query group_query LIMIT EQUALS NUMBER OFFSET EQUALS NUMBER
+	| modifier_list START_DATE EQUALS STRING
 	{
-		yylex.(*queryLexer).result = Query{
-			SelectQuery: $1,
-			GroupQuery:  &$2,
-			Offset:      $8,
-			Limit:       $5,
+		startDate, err := time.Parse(dateFormat, $4)
+		if err != nil {
+			yylex.Error(fmt.Sprintf("invalid start_date format (expected YYYY/MM/DD HH:MM:SS): %s", $4))
+			return 1
 		}
+		$$ = $1
+		$$.StartDate = &startDate
 	}
-	| compound_query group_query group_selector
+	| modifier_list END_DATE EQUALS STRING
 	{
-		yylex.(*queryLexer).result = Query{
-			SelectQuery:   $1,
-			GroupQuery:    &$2,
-			GroupSelector: $3,
+		endDate, err := time.Parse(dateFormat, $4)
+		if err != nil {
+			yylex.Error(fmt.Sprintf("invalid end_date format (expected YYYY/MM/DD HH:MM:SS): %s", $4))
+			return 1
 		}
+		$$ = $1
+		$$.EndDate = &endDate
 	}
-	| compound_query group_query group_selector OFFSET EQUALS NUMBER
+	| modifier_list group_query
 	{
-		yylex.(*queryLexer).result = Query{
-			SelectQuery:   $1,
-			GroupQuery:    &$2,
-			GroupSelector: $3,
-			Offset:        $6,
-		}
+		$$ = $1
+		gq := $2
+		$$.GroupQuery = &gq
 	}
-	| compound_query group_query group_selector LIMIT EQUALS NUMBER
+	| modifier_list group_selector
 	{
-		yylex.(*queryLexer).result = Query{
-			SelectQuery:   $1,
-			GroupQuery:    &$2,
-			GroupSelector: $3,
-			Limit:         $6,
-		}
-	}
-	| compound_query group_query group_selector OFFSET EQUALS NUMBER LIMIT EQUALS NUMBER
-	{
-		yylex.(*queryLexer).result = Query{
-			SelectQuery:   $1,
-			GroupQuery:    &$2,
-			GroupSelector: $3,
-			Offset:        $6,
-			Limit:         $9,
-		}
-	}
-	| compound_query group_query group_selector LIMIT EQUALS NUMBER OFFSET EQUALS NUMBER
-	{
-		yylex.(*queryLexer).result = Query{
-			SelectQuery:   $1,
-			GroupQuery:    &$2,
-			GroupSelector: $3,
-			Offset:        $9,
-			Limit:         $6,
-		}
-	}
-	| compound_query group_selector
-	{
-		yylex.Error("group specification requires group_by clause")
-		return 1
+		$$ = $1
+		$$.GroupSelector = $2
 	}
 	;
 
 compound_query:
 	atomic_query
 	{
-        $$ = CompoundSelectQuery{
-            Parts: []CompoundSelectQueryPart{
-                CompoundSelectQueryPart{ Operator: OpAnd, Query: $1 },
-            },
-        }
+		$$ = CompoundSelectQuery{
+			Parts: []CompoundSelectQueryPart{
+				{Operator: OpAnd, Query: $1},
+			},
+		}
 	}
 	| compound_query logical_op atomic_query
 	{
-        
-		$1.Parts = append($1.Parts, CompoundSelectQueryPart{ Operator: $2, Query: $3 })
-        $$ = $1
-    }
+		$$ = $1
+		$$.Parts = append($$.Parts, CompoundSelectQueryPart{
+			Operator: $2,
+			Query:    $3,
+		})
+	}
 	;
 
 logical_op:
@@ -372,7 +191,7 @@ field_query:
 	{
 		sessionId, err := uuid.Parse($3)
 		if err != nil {
-			yylex.Error(fmt.Sprintf("invalid UUID: %s", $3))
+			yylex.Error(fmt.Sprintf("invalid session_id (expected UUID): %s", $3))
 			return 1
 		}
 		$$ = SessionSelectQuery{
@@ -384,7 +203,7 @@ field_query:
 	{
 		id, err := uuid.Parse($3)
 		if err != nil {
-			yylex.Error(fmt.Sprintf("invalid UUID: %s", $3))
+			yylex.Error(fmt.Sprintf("invalid id (expected UUID): %s", $3))
 			return 1
 		}
 		$$ = IdSelectQuery{
@@ -424,16 +243,16 @@ field_query:
 	{
 		validStatuses := []TestcaseStatus{StatusPass, StatusFail, StatusError, StatusSkip}
 		var status TestcaseStatus
-                isValid := false
+		isValid := false
 		for _, s := range validStatuses {
 			if string(s) == $3 {
-                                status = s
+				status = s
 				isValid = true
 				break
 			}
 		}
 		if !isValid {
-			yylex.Error(fmt.Sprintf("invalid status: %s", $3))
+			yylex.Error(fmt.Sprintf("invalid status: %s (expected: pass, fail, error, skip)", $3))
 			return 1
 		}
 		$$ = StatusSelectQuery{
@@ -444,19 +263,24 @@ field_query:
 	;
 
 tag_query:
-	HASH STRING
-	{
-		$$ = TagSelectQuery{
-			Tag:      $2,
-			Operator: OpEq,
-		}
-	}
-	| HASH STRING equality_op STRING
+	HASH STRING equality_op STRING
 	{
 		$$ = TagValueSelectQuery{
 			Tag:      $2,
 			Value:    $4,
 			Operator: $3,
+		}
+	}
+	| HASH STRING equality_op
+	{
+		yylex.Error(fmt.Sprintf("expected value after equality operator for tag %s", $2))
+		return 1
+	}
+	| HASH STRING
+	{
+		$$ = TagSelectQuery{
+			Tag:      $2,
+			Operator: OpEq,
 		}
 	}
 	;
@@ -491,6 +315,13 @@ group_query:
 	}
 	;
 
+group_selector:
+	GROUP EQUALS LPAREN string_list RPAREN
+	{
+		$$ = $4
+	}
+	;
+
 group_token_list:
 	group_token
 	{
@@ -509,16 +340,7 @@ group_token:
 	}
 	| HASH STRING
 	{
-		$$ = TagGroupToken{
-			Tag: $2,
-		}
-	}
-	;
-
-group_selector:
-	GROUP EQUALS LPAREN string_list RPAREN
-	{
-		$$ = $4
+		$$ = TagGroupToken{Tag: $2}
 	}
 	;
 

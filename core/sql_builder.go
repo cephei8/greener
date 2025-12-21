@@ -67,6 +67,13 @@ func BuildTestcasesQuery(
 		Where("? = ?", bun.Ident(fmt.Sprintf("%s.user_id", testcasesTable)), userID).
 		OrderBy(fmt.Sprintf("%s.created_at", testcasesTable), bun.OrderDesc)
 
+	if queryAST.StartDate != nil {
+		cteQuery = cteQuery.Where("? >= ?", bun.Ident(fmt.Sprintf("%s.created_at", testcasesTable)), queryAST.StartDate)
+	}
+	if queryAST.EndDate != nil {
+		cteQuery = cteQuery.Where("? <= ?", bun.Ident(fmt.Sprintf("%s.created_at", testcasesTable)), queryAST.EndDate)
+	}
+
 	cteQuery = applySelectQuery(cteQuery, queryAST.SelectQuery)
 
 	if queryAST.GroupQuery != nil {
@@ -141,6 +148,13 @@ func BuildSessionsQuery(
 		Where("? = ?", bun.Ident(fmt.Sprintf("%s.user_id", sessionsTable)), userID).
 		Group(fmt.Sprintf("%s.id", sessionsTable)).
 		OrderBy(fmt.Sprintf("%s.created_at", sessionsTable), bun.OrderDesc)
+
+	if queryAST.StartDate != nil {
+		cteQuery = cteQuery.Where("? >= ?", bun.Ident(fmt.Sprintf("%s.created_at", sessionsTable)), queryAST.StartDate)
+	}
+	if queryAST.EndDate != nil {
+		cteQuery = cteQuery.Where("? <= ?", bun.Ident(fmt.Sprintf("%s.created_at", sessionsTable)), queryAST.EndDate)
+	}
 
 	cteQuery = applySelectQuery(cteQuery, queryAST.SelectQuery)
 
@@ -268,6 +282,13 @@ func BuildGroupsQuery(db *bun.DB, userID model_db.BinaryUUID, queryAST query.Que
 	}
 
 	cteQuery = cteQuery.Where("? = ?", bun.Ident(fmt.Sprintf("%s.user_id", testcasesTable)), userID)
+
+	if queryAST.StartDate != nil {
+		cteQuery = cteQuery.Where("? >= ?", bun.Ident(fmt.Sprintf("%s.created_at", testcasesTable)), queryAST.StartDate)
+	}
+	if queryAST.EndDate != nil {
+		cteQuery = cteQuery.Where("? <= ?", bun.Ident(fmt.Sprintf("%s.created_at", testcasesTable)), queryAST.EndDate)
+	}
 
 	if len(queryAST.GroupSelector) > 0 {
 		labelJoinIdx = 0
