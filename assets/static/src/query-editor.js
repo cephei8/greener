@@ -175,7 +175,7 @@ function initEditor() {
     editor.addEventListener('input', () => {
         highlight();
         showAutocomplete();
-        hiddenInput.value = editor.textContent;
+        hiddenInput.value = editor.textContent || '';
     });
 
     editor.addEventListener('keydown', (e) => {
@@ -242,8 +242,8 @@ function initEditor() {
 
     const btn = document.querySelector('.query-btn');
     if (btn) {
-        btn.addEventListener('click', () => {
-            hiddenInput.value = editor.textContent;
+        btn.addEventListener('click', (e) => {
+            hiddenInput.value = editor.textContent || '';
         });
     }
 
@@ -251,6 +251,8 @@ function initEditor() {
         editor.textContent = window.initialQuery;
         hiddenInput.value = window.initialQuery;
         highlight();
+    } else {
+        hiddenInput.value = '';
     }
 
     console.log('Prism query editor initialized');
