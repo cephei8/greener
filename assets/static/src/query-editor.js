@@ -2,7 +2,7 @@ if (typeof Prism !== 'undefined') {
     Prism.languages.greenerQuery = {
         'tag': /#"[^"]*"/,
         'string': /"(?:\\.|[^"\\])*"/,
-        'keyword': /\b(?:and|or)\b/i,
+        'keyword': /\b(?:and|or|offset|limit)\b/i,
         'function': /\b(?:group_by|group)\b/i,
         'identifier': /\b(?:session_id|id|name|status|classname|testsuite|file)\b/i,
         'status': /\b(?:pass|fail|error|skip)\b/i,
@@ -21,6 +21,8 @@ const suggestions = [
     { label: 'file', type: 'field', desc: 'File path' },
     { label: 'and', type: 'keyword', desc: 'Logical AND' },
     { label: 'or', type: 'keyword', desc: 'Logical OR' },
+    { label: 'offset=', type: 'keyword', desc: 'Skip first N results', insert: 'offset=' },
+    { label: 'limit=', type: 'keyword', desc: 'Limit to N results (max 100)', insert: 'limit=' },
     { label: 'group_by()', type: 'function', desc: 'Group results', insert: 'group_by()' },
     { label: 'group = ()', type: 'function', desc: 'Filter by group', insert: 'group = ()' },
     { label: 'pass', type: 'value', desc: 'Passed status' },

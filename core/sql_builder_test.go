@@ -2089,6 +2089,173 @@ func (s *BaseSuite) TestGroupsErrors() {
 	}
 }
 
+func (s *BaseSuite) TestOffsetLimit() {
+	tests := []struct {
+		name          string
+		queryAST      query.Query
+		expectedCount int
+		expectedFirst uuid.UUID
+		expectErr     bool
+		errMsg        string
+	}{
+		{
+			name: "default limit (100)",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+			},
+			expectedCount: 6,
+			expectedFirst: s.testcase6Id,
+		},
+		{
+			name: "limit 2",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				Limit: 2,
+			},
+			expectedCount: 2,
+			expectedFirst: s.testcase6Id,
+		},
+		{
+			name: "offset 2",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				Offset: 2,
+			},
+			expectedCount: 4,
+			expectedFirst: s.testcase4Id,
+		},
+		{
+			name: "offset 2 limit 2",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				Offset: 2,
+				Limit:  2,
+			},
+			expectedCount: 2,
+			expectedFirst: s.testcase4Id,
+		},
+		{
+			name: "limit 100 (max allowed)",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				Limit: 100,
+			},
+			expectedCount: 6,
+			expectedFirst: s.testcase6Id,
+		},
+		{
+			name: "limit 101 (exceeds max)",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				Limit: 101,
+			},
+			expectErr: true,
+			errMsg:    "limit cannot exceed 100",
+		},
+		{
+			name: "negative limit",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				Limit: -1,
+			},
+			expectErr: true,
+			errMsg:    "limit must be positive",
+		},
+		{
+			name: "negative offset",
+			queryAST: query.Query{
+				SelectQuery: query.CompoundSelectQuery{
+					Parts: []query.CompoundSelectQueryPart{
+						{Operator: query.OpAnd, Query: query.EmptySelectQuery{}},
+					},
+				},
+				Offset: -1,
+			},
+			expectErr: true,
+			errMsg:    "offset must be non-negative",
+		},
+	}
+
+	for _, tt := range tests {
+		s.T().Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			ctx := context.Background()
+
+			q, err := core.BuildTestcasesQuery(s.db, s.userID, tt.queryAST)
+			if tt.expectErr {
+				require.Error(t, err)
+				if tt.errMsg != "" {
+					assert.Contains(t, err.Error(), tt.errMsg)
+				}
+				return
+			}
+
+			require.NoError(t, err)
+
+			type testcaseRow struct {
+				ID        model_db.BinaryUUID     `bun:"id"`
+				SessionID model_db.BinaryUUID     `bun:"session_id"`
+				Name      string                  `bun:"name"`
+				Classname *string                 `bun:"classname"`
+				File      *string                 `bun:"file"`
+				Testsuite *string                 `bun:"testsuite"`
+				Output    *string                 `bun:"output"`
+				Status    model_db.TestcaseStatus `bun:"status"`
+				Baggage   []byte                  `bun:"baggage"`
+				CreatedAt time.Time               `bun:"created_at"`
+				UpdatedAt time.Time               `bun:"updated_at"`
+				UserID    model_db.BinaryUUID     `bun:"user_id"`
+			}
+
+			type result struct {
+				testcaseRow
+				TotalCount       int64 `bun:"total_count"`
+				AggregatedStatus int64 `bun:"aggregated_status"`
+			}
+
+			var results []result
+			err = q.Scan(ctx, &results)
+			require.NoError(t, err)
+
+			assert.Equal(t, tt.expectedCount, len(results))
+
+			if len(results) > 0 {
+				actualFirst := uuid.UUID(results[0].ID)
+				assert.Equal(t, tt.expectedFirst, actualFirst)
+			}
+		})
+	}
+}
+
 func TestSQLite(t *testing.T) {
 	t.Parallel()
 	suite.Run(t, new(SQLiteSuite))

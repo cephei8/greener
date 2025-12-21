@@ -65,6 +65,124 @@ func TestGroupSpecification(t *testing.T) {
 	}
 }
 
+func TestOffsetLimit(t *testing.T) {
+	tests := []struct {
+		name      string
+		input     string
+		wantErr   bool
+		checkFunc func(*testing.T, Query)
+	}{
+		{
+			name:    "offset only",
+			input:   `offset=10`,
+			wantErr: false,
+			checkFunc: func(t *testing.T, q Query) {
+				assert.Equal(t, 10, q.Offset)
+				assert.Equal(t, 0, q.Limit)
+			},
+		},
+		{
+			name:    "limit only",
+			input:   `limit=50`,
+			wantErr: false,
+			checkFunc: func(t *testing.T, q Query) {
+				assert.Equal(t, 0, q.Offset)
+				assert.Equal(t, 50, q.Limit)
+			},
+		},
+		{
+			name:    "offset then limit",
+			input:   `offset=20 limit=30`,
+			wantErr: false,
+			checkFunc: func(t *testing.T, q Query) {
+				assert.Equal(t, 20, q.Offset)
+				assert.Equal(t, 30, q.Limit)
+			},
+		},
+		{
+			name:    "limit then offset",
+			input:   `limit=40 offset=15`,
+			wantErr: false,
+			checkFunc: func(t *testing.T, q Query) {
+				assert.Equal(t, 15, q.Offset)
+				assert.Equal(t, 40, q.Limit)
+			},
+		},
+		{
+			name:    "query with offset",
+			input:   `status = "pass" offset=10`,
+			wantErr: false,
+			checkFunc: func(t *testing.T, q Query) {
+				assert.Equal(t, 10, q.Offset)
+				assert.Equal(t, 0, q.Limit)
+			},
+		},
+		{
+			name:    "query with limit",
+			input:   `status = "pass" limit=25`,
+			wantErr: false,
+			checkFunc: func(t *testing.T, q Query) {
+				assert.Equal(t, 0, q.Offset)
+				assert.Equal(t, 25, q.Limit)
+			},
+		},
+		{
+			name:    "query with offset and limit",
+			input:   `name = "test" offset=5 limit=100`,
+			wantErr: false,
+			checkFunc: func(t *testing.T, q Query) {
+				assert.Equal(t, 5, q.Offset)
+				assert.Equal(t, 100, q.Limit)
+			},
+		},
+		{
+			name:    "query with limit and offset",
+			input:   `name = "test" limit=75 offset=12`,
+			wantErr: false,
+			checkFunc: func(t *testing.T, q Query) {
+				assert.Equal(t, 12, q.Offset)
+				assert.Equal(t, 75, q.Limit)
+			},
+		},
+		{
+			name:    "group_by with offset and limit",
+			input:   `group_by(session_id) offset=3 limit=50`,
+			wantErr: false,
+			checkFunc: func(t *testing.T, q Query) {
+				require.NotNil(t, q.GroupQuery)
+				assert.Equal(t, 3, q.Offset)
+				assert.Equal(t, 50, q.Limit)
+			},
+		},
+		{
+			name:    "compound query with group_by and offset/limit",
+			input:   `status = "pass" group_by(#"env") offset=10 limit=20`,
+			wantErr: false,
+			checkFunc: func(t *testing.T, q Query) {
+				require.NotNil(t, q.GroupQuery)
+				assert.Equal(t, 10, q.Offset)
+				assert.Equal(t, 20, q.Limit)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			parser := NewParser(tt.input)
+			q, err := parser.Parse()
+
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				if tt.checkFunc != nil {
+					tt.checkFunc(t, q)
+				}
+			}
+		})
+	}
+}
+
 func TestValidation(t *testing.T) {
 	tests := []struct {
 		name      string

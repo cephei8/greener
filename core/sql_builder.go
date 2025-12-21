@@ -32,6 +32,30 @@ func convertQueryStatusToDBStatus(status query.TestcaseStatus) model_db.Testcase
 	}
 }
 
+func applyOffsetLimit(bunQuery *bun.SelectQuery, queryAST query.Query) (*bun.SelectQuery, error) {
+	offset := queryAST.Offset
+	if offset < 0 {
+		return nil, fmt.Errorf("offset must be non-negative")
+	}
+	if offset > 0 {
+		bunQuery = bunQuery.Offset(offset)
+	}
+
+	limit := queryAST.Limit
+	if limit == 0 {
+		limit = 100
+	}
+	if limit < 0 {
+		return nil, fmt.Errorf("limit must be positive")
+	}
+	if limit > 100 {
+		return nil, fmt.Errorf("limit cannot exceed 100")
+	}
+	bunQuery = bunQuery.Limit(limit)
+
+	return bunQuery, nil
+}
+
 func BuildTestcasesQuery(
 	db *bun.DB,
 	userID model_db.BinaryUUID,
@@ -85,8 +109,12 @@ func BuildTestcasesQuery(
 		Column("*").
 		ColumnExpr("COUNT(?) OVER() AS ?", 1, bun.Ident("total_count")).
 		ColumnExpr("MIN(?) OVER() AS ?", bun.Ident("status"), bun.Ident("aggregated_status")).
-		With("cte", cteQuery).
-		Limit(100)
+		With("cte", cteQuery)
+
+	mainQuery, err := applyOffsetLimit(mainQuery, queryAST)
+	if err != nil {
+		return nil, err
+	}
 
 	return mainQuery, nil
 }
@@ -152,8 +180,12 @@ func BuildSessionsQuery(
 		Table("cte").
 		Column("*").
 		ColumnExpr("COUNT(?) OVER() AS ?", 1, bun.Ident("total_count")).
-		With("cte", cteQuery).
-		Limit(100)
+		With("cte", cteQuery)
+
+	mainQuery, err := applyOffsetLimit(mainQuery, queryAST)
+	if err != nil {
+		return nil, err
+	}
 
 	return mainQuery, nil
 }
@@ -274,8 +306,12 @@ func BuildGroupsQuery(db *bun.DB, userID model_db.BinaryUUID, queryAST query.Que
 		Table("cte").
 		Column("*").
 		ColumnExpr("COUNT(?) OVER() AS ?", 1, bun.Ident("total_count")).
-		With("cte", cteQuery).
-		Limit(100)
+		With("cte", cteQuery)
+
+	mainQuery, err := applyOffsetLimit(mainQuery, queryAST)
+	if err != nil {
+		return nil, err
+	}
 
 	return mainQuery, nil
 }
