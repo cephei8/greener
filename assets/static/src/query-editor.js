@@ -222,6 +222,10 @@ function initEditor() {
     editor.addEventListener("keydown", (e) => {
         const items = dropdown.querySelectorAll(".autocomplete-item");
 
+        if (e.key === "Enter" && e.shiftKey) {
+            return;
+        }
+
         if (dropdown.classList.contains("show")) {
             if (e.key === "ArrowDown") {
                 e.preventDefault();

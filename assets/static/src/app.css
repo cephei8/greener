@@ -20,7 +20,8 @@
     color: hsl(var(--bc));
     outline: none;
     overflow-x: auto;
-    white-space: pre;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 .query-editor:focus {
