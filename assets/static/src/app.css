@@ -1,6 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@source "../../templates";
+
+@plugin "daisyui" {
+    themes: light --default, dark --prefersdark;
+    exclude: properties;
+}
 
 @import "prismjs/themes/prism.css";
 
