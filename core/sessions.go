@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"git.sr.ht/~cephei8/greener/core/model/api"
-	"git.sr.ht/~cephei8/greener/core/model/db"
-	"git.sr.ht/~cephei8/greener/core/query"
+	"github.com/cephei8/greener/core/model/api"
+	"github.com/cephei8/greener/core/model/db"
+	"github.com/cephei8/greener/core/query"
 	"github.com/google/uuid"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"

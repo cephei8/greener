@@ -9,10 +9,10 @@ import (
 	"net/http"
 	"os"
 
-	"git.sr.ht/~cephei8/greener/assets"
-	"git.sr.ht/~cephei8/greener/core"
-	"git.sr.ht/~cephei8/greener/core/dbutil"
 	"github.com/caarlos0/env/v11"
+	"github.com/cephei8/greener/assets"
+	"github.com/cephei8/greener/core"
+	"github.com/cephei8/greener/core/dbutil"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"

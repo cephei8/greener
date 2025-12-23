@@ -1,18 +1,9 @@
 # Contributing
 
-- Discussions
-    - IRC: #greener on Libera.Chat
-    - [greener-discuss mailing list](https://lists.sr.ht/~cephei8/greener-discuss)
-    - [Greener GitHub Discussions](https://github.com/cephei8/greener/discussions)
-- Issues
-    - [Greener SourceHut ticket tracker](https://todo.sr.ht/~cephei8/greener)
-    - [Greener GitHub Issues](https://github.com/cephei8/greener/issues)
+- [Greener Discussions](https://github.com/cephei8/greener/discussions)
+- [Greener Issues](https://github.com/cephei8/greener/issues)
 
-## GitHub pull requests
-GitHub pull requests are not accepted.
-
-## Patches
-Use [greener-devel mailing list](https://lists.sr.ht/~cephei8/greener-devel) for development discussions and submitting patches.
+## Pull requests
 
 ### Developer Certificate of Origin
 All commits submitted to this project must include a sign-off (a valid "Signed-off-by" line created using `git commit -s`).<br>
