@@ -7,11 +7,11 @@ import (
 	"net/url"
 	"strings"
 
-	"git.sr.ht/~cephei8/greener/assets"
 	"github.com/amacneil/dbmate/v2/pkg/dbmate"
 	_ "github.com/amacneil/dbmate/v2/pkg/driver/mysql"
 	_ "github.com/amacneil/dbmate/v2/pkg/driver/postgres"
 	_ "github.com/amacneil/dbmate/v2/pkg/driver/sqlite"
+	"github.com/cephei8/greener/assets"
 )
 
 func normalizeSQLiteURL(databaseURL string) string {

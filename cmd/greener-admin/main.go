@@ -9,8 +9,8 @@ import (
 	"os"
 	"time"
 
-	"git.sr.ht/~cephei8/greener/core/dbutil"
-	"git.sr.ht/~cephei8/greener/core/model/db"
+	"github.com/cephei8/greener/core/dbutil"
+	"github.com/cephei8/greener/core/model/db"
 	"github.com/google/uuid"
 	"github.com/urfave/cli/v3"
 	"golang.org/x/crypto/pbkdf2"

@@ -6,7 +6,7 @@ import (
 	"crypto/subtle"
 	"net/http"
 
-	"git.sr.ht/~cephei8/greener/core/model/db"
+	"github.com/cephei8/greener/core/model/db"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/uptrace/bun"
