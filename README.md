@@ -1,4 +1,7 @@
 # Greener
+
+[![Docker Image Version](https://img.shields.io/docker/v/cephei8/greener)](https://hub.docker.com/r/cephei8/greener)
+
 Greener is a platform for storing and viewing test results.
 
 It is easy to configure and self-host, integrates with your favorite test framework and supports a simple query language to let you access the data you need.
