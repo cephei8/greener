@@ -19,24 +19,18 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-node@v4
         with:
-          python-version: "3.13"
+          node-version: "20"
 
-      - run: pipx install poetry
+      - run: npm install
+      - run: npm run build
 
-      - run: poetry install --with test
-        working-directory: server
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
 
-      - run: poetry run pytest -v --postgres --mysql .
-        working-directory: server
-
-      - run: |
-          docker build -t greener-test:latest ..
-          python -m venv .venv
-          .venv/bin/python -m pip install -r requirements.txt
-          .venv/bin/python -m pytest -v --skip-sqlite
-        working-directory: tests_e2e
+      - run: go test ./...
 
   release_create:
     name: (Release) Create release
@@ -68,6 +62,7 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
+          context: .
           push: true
           tags: cephei8/greener:${{ env.GREENER_IMAGE_TAG }}, cephei8/greener:latest
           platforms: linux/amd64,linux/arm64
