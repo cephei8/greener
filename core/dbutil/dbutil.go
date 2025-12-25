@@ -49,6 +49,16 @@ func Init(dbURL string) (*bun.DB, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to open sqlite connection: %w", err)
 		}
+
+		_, err = db.Exec(`
+			PRAGMA journal_mode=WAL;
+			PRAGMA busy_timeout=5000;
+			PRAGMA foreign_keys=ON;
+		`)
+		if err != nil {
+			return nil, fmt.Errorf("failed to configure sqlite: %w", err)
+		}
+
 		model_db.Dialect = sqlitedialect.New()
 	} else {
 		return nil, fmt.Errorf("unsupported database URL scheme: %s (supported: postgres://, mysql://, sqlite:///)", dbURL)
