@@ -5,6 +5,8 @@
 /greener-admin
 
 /greener.db
+/greener.db-shm
+/greener.db-wal
 
 /node_modules
 /assets/static/dist
