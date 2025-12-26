@@ -70,6 +70,8 @@ function initEditor() {
     container.appendChild(hiddenInput);
 
     let selectedIndex = -1;
+    let cachedCursorPos = 0;
+    let cachedWord = "";
 
     function highlight() {
         const text = editor.textContent;
@@ -150,6 +152,9 @@ function initEditor() {
         const cursorPos = saveSelection()?.start || 0;
         const word = getWordAtCursor(text, cursorPos);
 
+        cachedCursorPos = cursorPos;
+        cachedWord = word;
+
         if (!word || word.length < 1) {
             dropdown.classList.remove("show");
             return;
@@ -185,10 +190,20 @@ function initEditor() {
         return match ? match[0] : "";
     }
 
-    function insertSuggestion(item) {
+    function insertSuggestion(
+        item,
+        wordToReplace = null,
+        cursorPosition = null,
+    ) {
         const text = editor.textContent;
-        const cursorPos = saveSelection()?.start || text.length;
-        const word = getWordAtCursor(text, cursorPos);
+        const cursorPos =
+            cursorPosition !== null
+                ? cursorPosition
+                : saveSelection()?.start || text.length;
+        const word =
+            wordToReplace !== null
+                ? wordToReplace
+                : getWordAtCursor(text, cursorPos);
 
         const before = text.substring(0, cursorPos - word.length);
         const after = text.substring(cursorPos);
@@ -241,35 +256,19 @@ function initEditor() {
             ) {
                 e.preventDefault();
                 const idx = parseInt(items[selectedIndex].dataset.index);
-                insertSuggestion(
-                    suggestions.filter((s) =>
-                        s.label
-                            .toLowerCase()
-                            .startsWith(
-                                getWordAtCursor(
-                                    editor.textContent,
-                                    saveSelection()?.start || 0,
-                                ).toLowerCase(),
-                            ),
-                    )[idx],
+                const matches = suggestions.filter((s) =>
+                    s.label.toLowerCase().startsWith(cachedWord.toLowerCase()),
                 );
+                insertSuggestion(matches[idx], cachedWord, cachedCursorPos);
             } else if (e.key === "Tab" && items.length > 0) {
                 e.preventDefault();
                 selectedIndex = 0;
                 updateSelection(items);
                 const idx = parseInt(items[0].dataset.index);
-                insertSuggestion(
-                    suggestions.filter((s) =>
-                        s.label
-                            .toLowerCase()
-                            .startsWith(
-                                getWordAtCursor(
-                                    editor.textContent,
-                                    saveSelection()?.start || 0,
-                                ).toLowerCase(),
-                            ),
-                    )[idx],
+                const matches = suggestions.filter((s) =>
+                    s.label.toLowerCase().startsWith(cachedWord.toLowerCase()),
                 );
+                insertSuggestion(matches[idx], cachedWord, cachedCursorPos);
             } else if (e.key === "Enter") {
                 e.preventDefault();
                 dropdown.classList.remove("show");
@@ -296,16 +295,9 @@ function initEditor() {
         if (item) {
             const idx = parseInt(item.dataset.index);
             const matches = suggestions.filter((s) =>
-                s.label
-                    .toLowerCase()
-                    .startsWith(
-                        getWordAtCursor(
-                            editor.textContent,
-                            saveSelection()?.start || 0,
-                        ).toLowerCase(),
-                    ),
+                s.label.toLowerCase().startsWith(cachedWord.toLowerCase()),
             );
-            insertSuggestion(matches[idx]);
+            insertSuggestion(matches[idx], cachedWord, cachedCursorPos);
         }
     });
 
