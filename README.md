@@ -14,14 +14,15 @@ Features:
 - No changes to test code needed
 - Simple SQL-like query language (with grouping support)
 - Attach labels and/or baggage (arbitrary JSON) to test sessions
-- Self-contained executable (only requires SQLite/PostgresSQL/MySQL database)
+- Self-contained executable (only requires SQLite/PostgreSQL/MySQL database)
 - Small (~27mb executable / compressed Docker image)
 
 
 
 Check out [Greener Documentation](https://greener.cephei8.dev) for details.
 
-TODO: demo
+Demo:
+![Demo](./docs/content/assets/demo.gif)
 
 ## Usage
 
@@ -51,7 +52,7 @@ greener-admin \
 Then open <http://localhost:8080> in your browser.
 
 #### Docker Compose
-Check out [compose.yaml](https://github.com/cephei8/greener/blob/main/compose.yaml) for example of using Docker Compose and PostgresSQL.
+Check out [compose.yaml](https://github.com/cephei8/greener/blob/main/compose.yaml) for example of using Docker Compose and PostgreSQL.
 
 ### Building from source
 
@@ -91,7 +92,7 @@ Plugins/reporters:
 - Jest reporter: [cephei8/jest-greener](https://github.com/cephei8/jest-greener)
 - Mocha reporter: [cephei8/mocha-greener](https://github.com/cephei8/mocha-greener)
 - Tool to report Go test results: [cephei8/greener-reporter-go](https://github.com/cephei8/greener-reporter-go)
-- Tool to report JUnit XML resilts: [cephei8/greener-reporter-junitxml](https://github.com/cephei8/greener-reporter-junitxml)
+- Tool to report JUnit XML results: [cephei8/greener-reporter-junitxml](https://github.com/cephei8/greener-reporter-junitxml)
 - CLI tool to report test results: [cephei8/greener-reporter-cli](https://github.com/cephei8/greener-reporter-cli)
 
 Supporting libraries:

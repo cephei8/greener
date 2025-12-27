@@ -14,23 +14,25 @@ Mount local directory and run Greener with SQLite database:
 mkdir greener-data
 
 docker run --rm \
-  -v $(pwd)/greener-data:/app/data \
-  -p 5096:5096 \
-  -e GREENER_DATABASE_URL=sqlite:///data/db.sqlite \
-  -e GREENER_AUTH_SECRET=my-secret \
-  cephei8/greener:latest
+    -v $(pwd)/greener-data:/app/data \
+    -p 8080:8080 \
+    -e GREENER_DATABASE_URL=sqlite:////app/data/greener.db \
+    -e GREENER_AUTH_SECRET=my-secret \
+    cephei8/greener:latest
 ```
 
-Create user (in a separate shell):
+Create user:
 ``` shell
-go install github.com/cephei8/greener/util/greener-admin-cli@latest
+go install github.com/cephei8/greener/cmd/greener-admin@main
 
-$GOPATH/bin/greener-admin-cli \
-  --db-url sqlite:///greener-data/db.sqlite \
-  create-user --username greener --password greener
+greener-admin \
+    --db-url sqlite:///greener-data/greener.db \
+    create-user \
+    --username greener \
+    --password greener
 ```
 
-Now, access Greener at http://localhost:5096 in the browser.
+Now, access Greener at http://localhost:8080 in your browser.
 
-## Plugin setup
-Check out [Plugins](plugins.md) for instructions.
+## Reporting test results to Greener
+Check out [Ecosystem](ecosystem.md) for ways to report test results to Greener.
