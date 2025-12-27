@@ -1,0 +1,8 @@
+commit-msg:
+  commands:
+    sign-off-check:
+      run: |
+        if ! grep -q "^Signed-off-by: cephei8 <i@cephei8\.dev>$" {1}; then
+          echo "Error: Missing sign-off line"
+          exit 1
+        fi
