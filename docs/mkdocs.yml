@@ -5,9 +5,10 @@ docs_dir: content
 nav:
   - Greener: index.md
   - Get Started: get-started.md
-  - Configuration: configuration.md
+  - Platform Configuration: platform-configuration.md
+  - Plugin Configuration: plugin-configuration.md
+  - Ecosystem: ecosystem.md
   - Query Language: query-language.md
-  - Plugins: plugins.md
   - Contact: contact.md
 theme:
   name: material
