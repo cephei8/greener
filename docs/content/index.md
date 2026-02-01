@@ -18,3 +18,6 @@ Features:
 
 Demo:
 ![Demo](assets/demo.gif)
+
+Demo of AI agent using Greener via MCP:
+![Demo - MCP](assets/demo_mcp.gif)
