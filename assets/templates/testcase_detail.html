@@ -7,7 +7,7 @@
 <div class="p-8">
     <div class="content-section">
         <div class="mb-4">
-            <a href="/testcases" class="btn btn-sm btn-ghost"><span data-icon="arrow-left" data-icon-class="h-4 w-4 inline"></span> Back to Testcases</a>
+            <a href="javascript:history.back()" class="btn btn-sm btn-ghost"><span data-icon="arrow-left" data-icon-class="h-4 w-4 inline"></span> Back</a>
         </div>
 
         <div class="section-container">
@@ -58,6 +58,30 @@
                 </tbody>
             </table>
         </div>
+
+        {{if .Labels}}
+        <div class="section-container">
+            <h2 class="section-header">Labels</h2>
+            <div class="overflow-x-auto">
+                <table class="labels-table table table-zebra table-xs">
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .Labels}}
+                        <tr>
+                            <td class="font-mono text-sm">{{.Key}}</td>
+                            <td class="font-mono text-sm">{{.Value}}</td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {{end}}
 
         {{if .Testcase.Baggage}}
         <div class="section-container">
