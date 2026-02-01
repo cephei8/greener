@@ -22,7 +22,11 @@
             <li><a href="/api-keys"{{if eq .ActivePage "apikeys"}} class="active"{{end}}>API Keys</a></li>
         </ul>
     </div>
-    <div class="navbar-end">
+    <div class="navbar-end gap-2">
+        <button id="mcp-tab-btn" onclick="toggleMCPTab()" class="btn btn-ghost btn-sm gap-1" title="Set this tab as MCP target">
+            <span data-icon="radio" data-icon-class="h-4 w-4"></span>
+            <span id="mcp-tab-label">MCP tab</span>
+        </button>
         <a href="#" hx-post="/logout" class="btn">Logout</a>
     </div>
 </div>
