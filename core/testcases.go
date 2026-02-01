@@ -122,6 +122,7 @@ func TestcasesHandler(c echo.Context) error {
 		"LoadedCount":  len(testcases),
 		"TotalRecords": totalCount,
 		"Query":        queryStr,
+		"ActivePage":   "testcases",
 	})
 }
 
@@ -228,5 +229,6 @@ func TestcaseDetailHandler(c echo.Context) error {
 			"Output":    outputStr,
 			"CreatedAt": testcase.CreatedAt.Format("2006-01-02 15:04:05"),
 		},
+		"ActivePage": "testcases",
 	})
 }

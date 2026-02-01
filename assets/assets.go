@@ -2,7 +2,7 @@ package assets
 
 import "embed"
 
-//go:embed templates/*.html
+//go:embed all:templates
 var TemplatesFS embed.FS
 
 //go:embed static/dist/*

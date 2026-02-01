@@ -2,33 +2,7 @@
 
 {{define "body"}}
 
-<div class="navbar bg-base-100 shadow-sm">
-    <div class="navbar-start">
-        <div class="dropdown">
-            <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
-                <span data-icon="menu" data-icon-class="h-5 w-5"></span>
-            </div>
-            <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                <li><a href="/sessions">Sessions</a></li>
-                <li><a href="/testcases">Testcases</a></li>
-                <li><a href="/groups">Groups</a></li>
-                <li><a href="/api-keys" class="active">API Keys</a></li>
-            </ul>
-        </div>
-        <a href="/sessions" class="btn btn-ghost text-xl">Greener</a>
-    </div>
-    <div class="navbar-center hidden lg:flex">
-        <ul class="menu menu-horizontal px-1">
-            <li><a href="/sessions">Sessions</a></li>
-            <li><a href="/testcases">Testcases</a></li>
-            <li><a href="/groups">Groups</a></li>
-            <li><a href="/api-keys" class="active">API Keys</a></li>
-        </ul>
-    </div>
-    <div class="navbar-end">
-        <a href="#" hx-post="/logout" class="btn">Logout</a>
-    </div>
-</div>
+{{template "navbar" .}}
 
 <div class="container mx-auto p-8">
     <div class="flex justify-between items-center mb-6">

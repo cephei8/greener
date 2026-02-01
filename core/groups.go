@@ -56,6 +56,7 @@ func GroupsHandler(c echo.Context) error {
 			"LoadedCount":  0,
 			"TotalRecords": 0,
 			"Query":        "",
+			"ActivePage":   "groups",
 		})
 	}
 
@@ -77,6 +78,7 @@ func GroupsHandler(c echo.Context) error {
 			"LoadedCount":  0,
 			"TotalRecords": 0,
 			"Query":        queryStr,
+			"ActivePage":   "groups",
 		})
 	}
 
@@ -172,5 +174,6 @@ func GroupsHandler(c echo.Context) error {
 		"LoadedCount":  len(groups),
 		"TotalRecords": totalCount,
 		"Query":        queryStr,
+		"ActivePage":   "groups",
 	})
 }

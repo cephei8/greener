@@ -15,17 +15,9 @@
         <tbody>
             {{range .Sessions}}
             <tr>
-                <td>
-                    {{if eq .Status "pass"}}
-                    <span data-icon="check-circle" data-icon-class="h-6 w-6 text-success"></span>
-                    {{else if or (eq .Status "fail") (eq .Status "error")}}
-                    <span data-icon="x-circle" data-icon-class="h-6 w-6 text-error"></span>
-                    {{else if eq .Status "skip"}}
-                    <span data-icon="help-circle" data-icon-class="h-6 w-6 text-warning"></span>
-                    {{end}}
-                </td>
+                <td>{{template "status_icon" .Status}}</td>
                 <td class="font-mono text-xs">
-                    <a href="#" onclick="copySessionId('{{.ID}}', event)" class="badge badge-ghost badge-sm hover:badge-primary transition-colors">{{.ID}}</a>
+                    <a href="#" onclick="copyId('{{.ID}}', event)" class="badge badge-ghost badge-sm hover:badge-primary transition-colors">{{.ID}}</a>
                 </td>
                 <td>{{.Description}}</td>
                 <td class="text-sm">{{.CreatedAt}}</td>
