@@ -183,6 +183,7 @@ func main() {
 
 	apiV1 := e.Group("/api/v1")
 	apiV1.GET("/sse/events", sse.NewHandler(sseHub))
+	apiV1.POST("/sse/set-primary", sse.NewSetPrimaryHandler(sseHub))
 	apiV1.Any("/mcp", mcpServer.EchoHandler(), oauthServer.BearerAuthMiddleware())
 
 	ingressHandler := core.NewIngressHandler(db)

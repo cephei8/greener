@@ -15,6 +15,11 @@ type MCPQueryEvent struct {
 	Query string `json:"query"`
 }
 
+type MCPTabStatusEvent struct {
+	ClientID  string `json:"client_id"`
+	IsPrimary bool   `json:"is_primary"`
+}
+
 type Client struct {
 	ID     string
 	UserID string
@@ -22,11 +27,12 @@ type Client struct {
 }
 
 type Hub struct {
-	clients    map[string]map[*Client]bool
-	register   chan *Client
-	unregister chan *Client
-	broadcast  chan *userMessage
-	mu         sync.RWMutex
+	clients       map[string]map[*Client]bool
+	primaryClient map[string]*Client
+	register      chan *Client
+	unregister    chan *Client
+	broadcast     chan *userMessage
+	mu            sync.RWMutex
 }
 
 type userMessage struct {
@@ -36,10 +42,11 @@ type userMessage struct {
 
 func NewHub() *Hub {
 	return &Hub{
-		clients:    make(map[string]map[*Client]bool),
-		register:   make(chan *Client),
-		unregister: make(chan *Client),
-		broadcast:  make(chan *userMessage, 256),
+		clients:       make(map[string]map[*Client]bool),
+		primaryClient: make(map[string]*Client),
+		register:      make(chan *Client),
+		unregister:    make(chan *Client),
+		broadcast:     make(chan *userMessage, 256),
 	}
 }
 
@@ -52,6 +59,11 @@ func (h *Hub) Run() {
 				h.clients[client.UserID] = make(map[*Client]bool)
 			}
 			h.clients[client.UserID][client] = true
+
+			if h.primaryClient[client.UserID] == nil {
+				h.primaryClient[client.UserID] = client
+				h.notifyPrimaryStatus(client, true)
+			}
 			h.mu.Unlock()
 
 		case client := <-h.unregister:
@@ -62,6 +74,9 @@ func (h *Hub) Run() {
 					close(client.Send)
 					if len(clients) == 0 {
 						delete(h.clients, client.UserID)
+					}
+					if h.primaryClient[client.UserID] == client {
+						delete(h.primaryClient, client.UserID)
 					}
 				}
 			}
@@ -108,13 +123,30 @@ func (h *Hub) BroadcastToUser(userID string, event Event) error {
 }
 
 func (h *Hub) BroadcastMCPQuery(userID string, page string, query string) error {
-	return h.BroadcastToUser(userID, Event{
-		Type: "mcp-query",
-		Data: MCPQueryEvent{
-			Page:  page,
-			Query: query,
-		},
+	h.mu.RLock()
+	primary := h.primaryClient[userID]
+	h.mu.RUnlock()
+
+	if primary == nil {
+		return nil
+	}
+
+	data, err := json.Marshal(MCPQueryEvent{
+		Page:  page,
+		Query: query,
 	})
+	if err != nil {
+		return err
+	}
+
+	sseData := formatSSEMessage("mcp-query", data)
+
+	select {
+	case primary.Send <- sseData:
+	default:
+	}
+
+	return nil
 }
 
 func formatSSEMessage(eventType string, data []byte) []byte {
@@ -141,4 +173,78 @@ func (h *Hub) TotalClientCount() int {
 		total += len(clients)
 	}
 	return total
+}
+
+func (h *Hub) SetPrimary(userID, clientID string) bool {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	clients, ok := h.clients[userID]
+	if !ok {
+		return false
+	}
+
+	var newPrimary *Client
+	for client := range clients {
+		if client.ID == clientID {
+			newPrimary = client
+			break
+		}
+	}
+
+	if newPrimary == nil {
+		return false
+	}
+
+	oldPrimary := h.primaryClient[userID]
+	if oldPrimary != nil && oldPrimary != newPrimary {
+		h.notifyPrimaryStatus(oldPrimary, false)
+	}
+
+	h.primaryClient[userID] = newPrimary
+	h.notifyPrimaryStatus(newPrimary, true)
+
+	return true
+}
+
+func (h *Hub) notifyPrimaryStatus(client *Client, isPrimary bool) {
+	data, err := json.Marshal(MCPTabStatusEvent{
+		ClientID:  client.ID,
+		IsPrimary: isPrimary,
+	})
+	if err != nil {
+		return
+	}
+
+	sseData := formatSSEMessage("mcp-tab-status", data)
+
+	select {
+	case client.Send <- sseData:
+	default:
+	}
+}
+
+func (h *Hub) IsPrimary(userID, clientID string) bool {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+
+	primary := h.primaryClient[userID]
+	return primary != nil && primary.ID == clientID
+}
+
+func (h *Hub) GetClientID(userID, clientID string) *Client {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+
+	clients, ok := h.clients[userID]
+	if !ok {
+		return nil
+	}
+
+	for client := range clients {
+		if client.ID == clientID {
+			return client
+		}
+	}
+	return nil
 }

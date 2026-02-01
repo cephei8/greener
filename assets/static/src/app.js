@@ -23,6 +23,9 @@ document.addEventListener("htmx:afterSettle", () => {
     initIcons();
 });
 
+let sseClientId = null;
+let isMCPTab = false;
+
 function initSSE() {
     if (window.location.pathname === "/login") {
         return;
@@ -39,6 +42,13 @@ function initSSE() {
         eventSource.addEventListener("connected", (e) => {
             console.log("SSE connected");
             reconnectAttempts = 0;
+            try {
+                const data = JSON.parse(e.data);
+                sseClientId = data.client_id;
+                console.log("SSE client ID:", sseClientId);
+            } catch (err) {
+                console.error("Failed to parse connected event:", err);
+            }
         });
 
         eventSource.addEventListener("mcp-query", (e) => {
@@ -47,6 +57,18 @@ function initSSE() {
                 handleMCPQuery(data);
             } catch (err) {
                 console.error("Failed to parse MCP query event:", err);
+            }
+        });
+
+        eventSource.addEventListener("mcp-tab-status", (e) => {
+            try {
+                const data = JSON.parse(e.data);
+                if (data.client_id === sseClientId) {
+                    isMCPTab = data.is_primary;
+                    updateMCPTabUI();
+                }
+            } catch (err) {
+                console.error("Failed to parse MCP tab status event:", err);
             }
         });
 
@@ -72,6 +94,45 @@ function initSSE() {
         }
     });
 }
+
+function updateMCPTabUI() {
+    const btn = document.getElementById("mcp-tab-btn");
+    const label = document.getElementById("mcp-tab-label");
+    if (btn && label) {
+        if (isMCPTab) {
+            btn.classList.remove("btn-ghost");
+            btn.classList.add("btn-primary");
+            label.textContent = "MCP tab";
+        } else {
+            btn.classList.remove("btn-primary");
+            btn.classList.add("btn-ghost");
+            label.textContent = "MCP tab";
+        }
+    }
+}
+
+window.toggleMCPTab = async function () {
+    if (!sseClientId) {
+        console.error("No SSE client ID available");
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/v1/sse/set-primary", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ client_id: sseClientId }),
+        });
+
+        if (!response.ok) {
+            console.error("Failed to set MCP tab:", response.statusText);
+        }
+    } catch (err) {
+        console.error("Failed to set MCP tab:", err);
+    }
+};
 
 function handleMCPQuery(data) {
     const { page, query } = data;
