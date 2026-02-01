@@ -29,8 +29,11 @@ greener-admin \
     --db-url sqlite:///greener-data/greener.db \
     create-user \
     --username greener \
-    --password greener
+    --password greener \
+    --role editor
 ```
+
+The `--role` flag accepts `editor` (full access) or `viewer` (read-only). Default is `viewer`.
 
 Now, access Greener at http://localhost:8080 in your browser.
 

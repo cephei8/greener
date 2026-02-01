@@ -11,6 +11,7 @@ Features:
 - Easy to use
 - No changes to test code needed
 - Simple SQL-like query language (with grouping support)
+- MCP server for AI agent integration
 - Attach labels and/or baggage (arbitrary JSON) to test sessions
 - Self-contained executable (only requires SQLite/PostgreSQL/MySQL database)
 - Small (~27mb executable / compressed Docker image)

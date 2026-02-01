@@ -13,6 +13,7 @@ Features:
 - Easy to use
 - No changes to test code needed
 - Simple SQL-like query language (with grouping support)
+- MCP server for AI agent integration
 - Attach labels and/or baggage (arbitrary JSON) to test sessions
 - Self-contained executable (only requires SQLite/PostgreSQL/MySQL database)
 - Small (~27mb executable / compressed Docker image)
@@ -39,14 +40,15 @@ docker run --rm \
     -e GREENER_AUTH_SECRET=my-secret \
     cephei8/greener:latest
 
-# create user
+# create user (--role: editor or viewer, default: viewer)
 go install github.com/cephei8/greener/cmd/greener-admin@main
 
 greener-admin \
     --db-url sqlite:///greener-data/greener.db \
     create-user \
     --username greener \
-    --password greener
+    --password greener \
+    --role editor
 ```
 
 Then open <http://localhost:8080> in your browser.
@@ -67,14 +69,15 @@ mkdir greener-data
 
 ./greener --db-url "sqlite:///greener-data/greener.db" --auth-secret "my-secret"
 
-# create user
+# create user (--role: editor or viewer, default: viewer)
 go install github.com/cephei8/greener/cmd/greener-admin@main
 
 greener-admin \
     --db-url sqlite:///greener-data/greener.db \
     create-user \
     --username greener \
-    --password greener
+    --password greener \
+    --role editor
 ```
 
 Then open <http://localhost:8080> in your browser.
