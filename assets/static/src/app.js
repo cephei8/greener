@@ -12,6 +12,7 @@ import { initIcons } from "./icons.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     initIcons();
+    initSSE();
 });
 
 document.addEventListener("htmx:afterSwap", () => {
@@ -21,6 +22,91 @@ document.addEventListener("htmx:afterSwap", () => {
 document.addEventListener("htmx:afterSettle", () => {
     initIcons();
 });
+
+function initSSE() {
+    if (window.location.pathname === "/login") {
+        return;
+    }
+
+    let eventSource = null;
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 5;
+    const reconnectDelay = 3000;
+
+    function connect() {
+        eventSource = new EventSource("/api/v1/sse/events");
+
+        eventSource.addEventListener("connected", (e) => {
+            console.log("SSE connected");
+            reconnectAttempts = 0;
+        });
+
+        eventSource.addEventListener("mcp-query", (e) => {
+            try {
+                const data = JSON.parse(e.data);
+                handleMCPQuery(data);
+            } catch (err) {
+                console.error("Failed to parse MCP query event:", err);
+            }
+        });
+
+        eventSource.onerror = (e) => {
+            console.error("SSE connection error");
+            eventSource.close();
+
+            if (reconnectAttempts < maxReconnectAttempts) {
+                reconnectAttempts++;
+                console.log(
+                    `Reconnecting SSE (attempt ${reconnectAttempts})...`,
+                );
+                setTimeout(connect, reconnectDelay);
+            }
+        };
+    }
+
+    connect();
+
+    window.addEventListener("beforeunload", () => {
+        if (eventSource) {
+            eventSource.close();
+        }
+    });
+}
+
+function handleMCPQuery(data) {
+    const { page, query } = data;
+
+    if (window.location.pathname !== page) {
+        if (query) {
+            window.location.href = page + "?query=" + encodeURIComponent(query);
+        } else {
+            window.location.href = page;
+        }
+        return;
+    }
+
+    const queryEditor = document.querySelector(".query-editor");
+    const queryInput = document.querySelector("#query-value");
+    const queryBtn = document.querySelector(".query-btn");
+
+    if (queryEditor && queryInput) {
+        queryEditor.textContent = query;
+        queryInput.value = query;
+
+        if (window.Prism) {
+            const highlighted = Prism.highlight(
+                query,
+                Prism.languages.greenerQuery,
+                "greenerQuery",
+            );
+            queryEditor.innerHTML = highlighted;
+        }
+
+        if (queryBtn) {
+            queryBtn.click();
+        }
+    }
+}
 
 function showCopyFeedback(element) {
     const tooltip = document.createElement("div");

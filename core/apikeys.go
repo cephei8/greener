@@ -46,7 +46,7 @@ func APIKeysHandler(c echo.Context) error {
 	var apiKeys []model_db.APIKey
 	err = db.NewSelect().
 		Model(&apiKeys).
-		Where("user_id = ?", model_db.BinaryUUID(userId)).
+		Where("? = ?", bun.Ident("user_id"), model_db.BinaryUUID(userId)).
 		OrderExpr("created_at DESC").
 		Scan(ctx)
 	if err != nil {
@@ -252,7 +252,7 @@ func DeleteAPIKeyHandler(c echo.Context) error {
 
 	_, err = db.NewDelete().
 		Model((*model_db.APIKey)(nil)).
-		Where("id = ? AND user_id = ?", model_db.BinaryUUID(id), model_db.BinaryUUID(userID)).
+		Where("? = ? AND ? = ?", bun.Ident("id"), model_db.BinaryUUID(id), bun.Ident("user_id"), model_db.BinaryUUID(userID)).
 		Exec(ctx)
 	if err != nil {
 		c.Logger().Errorf("Failed to delete API key: %v", err)
@@ -262,7 +262,7 @@ func DeleteAPIKeyHandler(c echo.Context) error {
 	var apiKeys []model_db.APIKey
 	err = db.NewSelect().
 		Model(&apiKeys).
-		Where("user_id = ?", model_db.BinaryUUID(userID)).
+		Where("? = ?", bun.Ident("user_id"), model_db.BinaryUUID(userID)).
 		OrderExpr("created_at DESC").
 		Scan(ctx)
 	if err != nil {
