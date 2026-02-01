@@ -64,7 +64,6 @@ func BuildTestcasesQuery(
 	cteQuery := db.NewSelect().
 		Column(fmt.Sprintf("%s.*", testcasesTable)).
 		Table(fmt.Sprintf("%s", testcasesTable)).
-		Where("? = ?", bun.Ident(fmt.Sprintf("%s.user_id", testcasesTable)), userID).
 		OrderBy(fmt.Sprintf("%s.created_at", testcasesTable), bun.OrderDesc)
 
 	if queryAST.StartDate != nil {
@@ -145,7 +144,6 @@ func BuildSessionsQuery(
 			bun.Ident(fmt.Sprintf("%s.id", sessionsTable)),
 			bun.Ident(fmt.Sprintf("%s.session_id", testcasesTable)),
 		).
-		Where("? = ?", bun.Ident(fmt.Sprintf("%s.user_id", sessionsTable)), userID).
 		Group(fmt.Sprintf("%s.id", sessionsTable)).
 		OrderBy(fmt.Sprintf("%s.created_at", sessionsTable), bun.OrderDesc)
 
@@ -280,8 +278,6 @@ func BuildGroupsQuery(db *bun.DB, userID model_db.BinaryUUID, queryAST query.Que
 			labelJoinIdx++
 		}
 	}
-
-	cteQuery = cteQuery.Where("? = ?", bun.Ident(fmt.Sprintf("%s.user_id", testcasesTable)), userID)
 
 	if queryAST.StartDate != nil {
 		cteQuery = cteQuery.Where("? >= ?", bun.Ident(fmt.Sprintf("%s.created_at", testcasesTable)), queryAST.StartDate)

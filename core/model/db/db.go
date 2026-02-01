@@ -94,6 +94,7 @@ type User struct {
 	Username     string     `bun:"username,notnull"`
 	PasswordSalt []byte     `bun:"password_salt,notnull"`
 	PasswordHash []byte     `bun:"password_hash,notnull"`
+	Role         UserRole   `bun:"role,notnull"`
 	CreatedAt    time.Time  `bun:"created_at,nullzero,notnull"`
 	UpdatedAt    time.Time  `bun:"updated_at,nullzero,notnull"`
 }
@@ -132,6 +133,13 @@ type Label struct {
 	CreatedAt time.Time  `bun:"created_at,nullzero,notnull"`
 	UpdatedAt time.Time  `bun:"updated_at,nullzero,notnull"`
 }
+
+type UserRole string
+
+const (
+	RoleEditor UserRole = "editor"
+	RoleViewer UserRole = "viewer"
+)
 
 type TestcaseStatus int
 

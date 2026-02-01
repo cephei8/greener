@@ -73,9 +73,13 @@ func APIKeysHandler(c echo.Context) error {
 		}
 	}
 
+	role, _ := sess.Values["role"].(string)
+	isViewer := role == string(model_db.RoleViewer)
+
 	return c.Render(http.StatusOK, "apikeys.html", map[string]any{
 		"APIKeys":    apiKeyViews,
 		"ActivePage": "apikeys",
+		"IsViewer":   isViewer,
 	})
 }
 
@@ -98,6 +102,11 @@ func CreateAPIKeyHandler(c echo.Context) error {
 		sess.Values["authenticated"] = false
 		sess.Save(c.Request(), c.Response())
 		return c.HTML(http.StatusUnauthorized, `<div class="alert alert-error">Unauthorized</div>`)
+	}
+
+	role, _ := sess.Values["role"].(string)
+	if role == string(model_db.RoleViewer) {
+		return c.HTML(http.StatusForbidden, `<div class="alert alert-error">Viewers cannot create API keys. Editor role is required.</div>`)
 	}
 
 	description := c.FormValue("description")

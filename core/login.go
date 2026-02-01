@@ -62,6 +62,7 @@ func LoginHandler(c echo.Context) error {
 	sess.Values["authenticated"] = true
 	sess.Values["username"] = username
 	sess.Values["user_id"] = user.ID.String()
+	sess.Values["role"] = string(user.Role)
 	sess.Save(c.Request(), c.Response())
 
 	c.Response().Header().Set("HX-Redirect", "/sessions")
@@ -73,6 +74,7 @@ func LogoutHandler(c echo.Context) error {
 	sess.Values["authenticated"] = false
 	delete(sess.Values, "username")
 	delete(sess.Values, "user_id")
+	delete(sess.Values, "role")
 	sess.Save(c.Request(), c.Response())
 
 	c.Response().Header().Set("HX-Redirect", "/login")

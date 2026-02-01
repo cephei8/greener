@@ -1,6 +1,7 @@
 import checkCircle from "heroicons/24/solid/check-circle.svg";
 import xCircle from "heroicons/24/solid/x-circle.svg";
 import questionMarkCircle from "heroicons/24/solid/question-mark-circle.svg";
+import exclamationTriangle from "heroicons/24/solid/exclamation-triangle.svg";
 import bars3 from "heroicons/24/solid/bars-3.svg";
 import arrowLeft from "heroicons/24/solid/arrow-left.svg";
 
@@ -8,6 +9,7 @@ const iconMap = {
     "check-circle": checkCircle,
     "x-circle": xCircle,
     "help-circle": questionMarkCircle,
+    "exclamation-triangle": exclamationTriangle,
     "arrow-left": arrowLeft,
     menu: bars3,
 };

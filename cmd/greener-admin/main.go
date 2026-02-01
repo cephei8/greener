@@ -42,6 +42,11 @@ func main() {
 						Usage:    "User password",
 						Required: true,
 					},
+					&cli.StringFlag{
+						Name:  "role",
+						Usage: "User role (editor or viewer)",
+						Value: "viewer",
+					},
 				},
 				Action: createUserAction,
 			},
@@ -70,6 +75,12 @@ func createUserAction(ctx context.Context, cmd *cli.Command) error {
 	url := cmd.String("db-url")
 	username := cmd.String("username")
 	password := cmd.String("password")
+	roleStr := cmd.String("role")
+
+	role := model_db.UserRole(roleStr)
+	if role != model_db.RoleEditor && role != model_db.RoleViewer {
+		return fmt.Errorf("invalid role: %s (must be 'editor' or 'viewer')", roleStr)
+	}
 
 	db, err := dbutil.Init(url)
 	if err != nil {
@@ -87,6 +98,7 @@ func createUserAction(ctx context.Context, cmd *cli.Command) error {
 		Username:     username,
 		PasswordSalt: salt,
 		PasswordHash: passwordHash,
+		Role:         role,
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}
@@ -95,7 +107,7 @@ func createUserAction(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("failed to create user: %w", err)
 	}
 
-	fmt.Printf("User created successfully: %s\n", username)
+	fmt.Printf("User created successfully: %s (role: %s)\n", username, role)
 	return nil
 }
 

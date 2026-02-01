@@ -87,6 +87,7 @@ func (s *BaseSuite) setupTestData() {
 		Username:     "testuser",
 		PasswordSalt: []byte("salt"),
 		PasswordHash: []byte("hash"),
+		Role:         model_db.RoleEditor,
 	}
 	_, err := s.db.NewInsert().Model(user).Exec(ctx)
 	s.Require().NoError(err)
