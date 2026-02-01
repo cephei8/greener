@@ -74,7 +74,8 @@ func APIKeysHandler(c echo.Context) error {
 	}
 
 	return c.Render(http.StatusOK, "apikeys.html", map[string]any{
-		"APIKeys": apiKeyViews,
+		"APIKeys":    apiKeyViews,
+		"ActivePage": "apikeys",
 	})
 }
 

@@ -1,0 +1,15 @@
+{{define "status_icon"}}
+{{if eq . "pass"}}
+<span data-icon="check-circle" data-icon-class="h-6 w-6 text-success"></span>
+{{else if or (eq . "fail") (eq . "error")}}
+<span data-icon="x-circle" data-icon-class="h-6 w-6 text-error"></span>
+{{else if eq . "skip"}}
+<span data-icon="help-circle" data-icon-class="h-6 w-6 text-warning"></span>
+{{end}}
+{{end}}
+
+{{define "status_badge"}}
+<span class="badge {{if eq . "pass"}}badge-success{{else if or (eq . "fail") (eq . "error")}}badge-error{{else if eq . "skip"}}badge-warning{{end}}">
+    {{.}}
+</span>
+{{end}}

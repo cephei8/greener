@@ -2,73 +2,18 @@
 
 {{define "head"}}
 {{template "query_editor.html" .}}
-<style>
-    #query-error:empty {
-        display: none;
-    }
-</style>
 <script>
     window.initialQuery = `{{.Query}}`;
 
     document.addEventListener('DOMContentLoaded', function() {
-        const queryError = document.getElementById('query-error');
-        if (queryError) {
-            queryError.textContent = '';
-        }
-
-        document.body.addEventListener('htmx:afterSwap', function(event) {
-            if (event.detail.target.id === 'groups-table') {
-                const queryError = document.getElementById('query-error');
-                if (queryError) {
-                    queryError.textContent = '';
-                }
-
-                const queryInput = document.querySelector('#query-value');
-                if (queryInput) {
-                    const queryValue = queryInput.value;
-                    const url = new URL(window.location);
-                    if (queryValue && queryValue.trim() !== '') {
-                        url.searchParams.set('query', queryValue);
-                    } else {
-                        url.searchParams.delete('query');
-                    }
-                    window.history.pushState({}, '', url);
-                }
-            }
-        });
+        initQueryPage('groups-table');
     });
 </script>
 {{end}}
 
 {{define "body"}}
 
-<div class="navbar bg-base-100 shadow-sm">
-    <div class="navbar-start">
-        <div class="dropdown">
-            <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
-                <span data-icon="menu" data-icon-class="h-5 w-5"></span>
-            </div>
-            <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                <li><a href="/sessions">Sessions</a></li>
-                <li><a href="/testcases">Testcases</a></li>
-                <li><a href="/groups" class="active">Groups</a></li>
-                <li><a href="/api-keys">API Keys</a></li>
-            </ul>
-        </div>
-        <a href="/sessions" class="btn btn-ghost text-xl">Greener</a>
-    </div>
-    <div class="navbar-center hidden lg:flex">
-        <ul class="menu menu-horizontal px-1">
-            <li><a href="/sessions">Sessions</a></li>
-            <li><a href="/testcases">Testcases</a></li>
-            <li><a href="/groups" class="active">Groups</a></li>
-            <li><a href="/api-keys">API Keys</a></li>
-        </ul>
-    </div>
-    <div class="navbar-end">
-        <a href="#" hx-post="/logout" class="btn">Logout</a>
-    </div>
-</div>
+{{template "navbar" .}}
 
 <div class="flex flex-col h-screen" hx-ext="response-targets">
     <!-- Query Section -->
@@ -76,7 +21,7 @@
         <form class="w-4/5" hx-post="/groups/query" hx-target="#groups-table" hx-target-error="#query-error">
             <div class="flex gap-2 items-start">
                 <div class="query-editor-container flex-1">
-                    <div class="query-editor" contenteditable="true" spellcheck="false" data-placeholder="Enter your testcases query..."></div>
+                    <div class="query-editor" contenteditable="true" spellcheck="false" data-placeholder="Enter your groups query..."></div>
                 </div>
                 <button type="submit" class="btn btn-primary btn-sm px-8 query-btn">
                     Query
@@ -103,15 +48,7 @@
                     <tbody>
                         {{range .Groups}}
                         <tr>
-                            <td>
-                                {{if eq .Status "pass"}}
-                                <span data-icon="check-circle" data-icon-class="h-6 w-6 text-success"></span>
-                                {{else if or (eq .Status "fail") (eq .Status "error")}}
-                                <span data-icon="x-circle" data-icon-class="h-6 w-6 text-error"></span>
-                                {{else if eq .Status "skip"}}
-                                <span data-icon="help-circle" data-icon-class="h-6 w-6 text-warning"></span>
-                                {{end}}
-                            </td>
+                            <td>{{template "status_icon" .Status}}</td>
                             <td>{{.Group}}</td>
                         </tr>
                         {{end}}

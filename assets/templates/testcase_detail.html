@@ -1,77 +1,8 @@
 {{define "title"}}Testcase Details{{end}}
 
-{{define "head"}}
-<style>
-    .detail-table {
-        width: 100%;
-        max-width: 800px;
-        margin: 0 auto;
-    }
-    .detail-table td:first-child {
-        font-weight: 600;
-        width: 200px;
-        padding-right: 1rem;
-    }
-    .monospace-section {
-        background-color: hsl(var(--b2));
-        padding: 1rem;
-        border-radius: 0.5rem;
-        font-family: monospace;
-        white-space: pre-wrap;
-        overflow-x: auto;
-        font-size: 0.875rem;
-        max-width: 100%;
-    }
-    .content-section {
-        max-width: 800px;
-        margin: 0 auto;
-    }
-    .section-header {
-        font-size: 1.25rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid hsl(var(--b3));
-    }
-    .section-container {
-        margin-bottom: 2rem;
-        padding: 1.5rem;
-        background-color: hsl(var(--b1));
-        border-radius: 0.5rem;
-        border: 1px solid hsl(var(--b3));
-    }
-</style>
-{{end}}
-
 {{define "body"}}
 
-<div class="navbar bg-base-100 shadow-sm">
-    <div class="navbar-start">
-        <div class="dropdown">
-            <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
-                <span data-icon="menu" data-icon-class="h-5 w-5"></span>
-            </div>
-            <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                <li><a href="/sessions">Sessions</a></li>
-                <li><a href="/testcases" class="active">Testcases</a></li>
-                <li><a href="/groups">Groups</a></li>
-                <li><a href="/api-keys">API Keys</a></li>
-            </ul>
-        </div>
-        <a href="/sessions" class="btn btn-ghost text-xl">Greener</a>
-    </div>
-    <div class="navbar-center hidden lg:flex">
-        <ul class="menu menu-horizontal px-1">
-            <li><a href="/sessions">Sessions</a></li>
-            <li><a href="/testcases" class="active">Testcases</a></li>
-            <li><a href="/groups">Groups</a></li>
-            <li><a href="/api-keys">API Keys</a></li>
-        </ul>
-    </div>
-    <div class="navbar-end">
-        <a href="#" hx-post="/logout" class="btn">Logout</a>
-    </div>
-</div>
+{{template "navbar" .}}
 
 <div class="p-8">
     <div class="content-section">
@@ -116,16 +47,8 @@
                 <tr>
                     <td class="py-2">Status</td>
                     <td class="py-2 flex items-center gap-2">
-                        {{if eq .Testcase.Status "pass"}}
-                        <span data-icon="check-circle" data-icon-class="h-6 w-6 text-success"></span>
-                        {{else if or (eq .Testcase.Status "fail") (eq .Testcase.Status "error")}}
-                        <span data-icon="x-circle" data-icon-class="h-6 w-6 text-error"></span>
-                        {{else if eq .Testcase.Status "skip"}}
-                        <span data-icon="help-circle" data-icon-class="h-6 w-6 text-warning"></span>
-                        {{end}}
-                        <span class="badge {{if eq .Testcase.Status "pass"}}badge-success{{else if or (eq .Testcase.Status "fail") (eq .Testcase.Status "error")}}badge-error{{else if eq .Testcase.Status "skip"}}badge-warning{{end}}">
-                            {{.Testcase.Status}}
-                        </span>
+                        {{template "status_icon" .Testcase.Status}}
+                        {{template "status_badge" .Testcase.Status}}
                     </td>
                 </tr>
                 <tr>

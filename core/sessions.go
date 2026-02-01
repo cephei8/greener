@@ -123,6 +123,7 @@ func SessionsHandler(c echo.Context) error {
 		"LoadedCount":  len(sessions),
 		"TotalRecords": totalCount,
 		"Query":        queryStr,
+		"ActivePage":   "sessions",
 	})
 }
 
@@ -249,6 +250,7 @@ func SessionDetailHandler(c echo.Context) error {
 			"Baggage":     baggageStr,
 			"CreatedAt":   sessionData.CreatedAt.Format("2006-01-02 15:04:05"),
 		},
-		"Labels": labelList,
+		"Labels":     labelList,
+		"ActivePage": "sessions",
 	})
 }

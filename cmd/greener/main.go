@@ -82,37 +82,46 @@ func main() {
 	}
 
 	templates := make(map[string]*template.Template)
+
+	componentTemplates := []string{
+		"templates/base.html",
+		"templates/components/navbar.html",
+		"templates/components/status_icon.html",
+	}
+
 	templates["login.html"] = template.Must(template.New("").
 		Funcs(funcMap).
-		ParseFS(assets.TemplatesFS, "templates/base.html", "templates/login.html"))
+		ParseFS(assets.TemplatesFS, append(componentTemplates, "templates/login.html")...))
 	templates["testcases.html"] = template.Must(template.New("").
 		Funcs(funcMap).
-		ParseFS(assets.TemplatesFS, "templates/base.html", "templates/query_editor.html", "templates/testcases.html"))
+		ParseFS(assets.TemplatesFS, append(componentTemplates, "templates/query_editor.html", "templates/testcases.html")...))
 	templates["testcase_detail.html"] = template.Must(template.New("").
 		Funcs(funcMap).
-		ParseFS(assets.TemplatesFS, "templates/base.html", "templates/testcase_detail.html"))
+		ParseFS(assets.TemplatesFS, append(componentTemplates, "templates/testcase_detail.html")...))
 	templates["sessions.html"] = template.Must(template.New("").
 		Funcs(funcMap).
-		ParseFS(assets.TemplatesFS, "templates/base.html", "templates/query_editor.html", "templates/sessions.html"))
+		ParseFS(assets.TemplatesFS, append(componentTemplates, "templates/query_editor.html", "templates/sessions.html")...))
 	templates["session_detail.html"] = template.Must(template.New("").
 		Funcs(funcMap).
-		ParseFS(assets.TemplatesFS, "templates/base.html", "templates/session_detail.html"))
+		ParseFS(assets.TemplatesFS, append(componentTemplates, "templates/session_detail.html")...))
 	templates["groups.html"] = template.Must(template.New("").
 		Funcs(funcMap).
-		ParseFS(assets.TemplatesFS, "templates/base.html", "templates/query_editor.html", "templates/groups.html"))
+		ParseFS(assets.TemplatesFS, append(componentTemplates, "templates/query_editor.html", "templates/groups.html")...))
 	templates["apikeys.html"] = template.Must(template.New("").
 		Funcs(funcMap).
-		ParseFS(assets.TemplatesFS, "templates/base.html", "templates/apikeys.html"))
+		ParseFS(assets.TemplatesFS, append(componentTemplates, "templates/apikeys.html")...))
 
+	// Table templates (HTMX partials) - include status_icon component
+	tableComponents := []string{"templates/components/status_icon.html"}
 	templates["testcases_table.html"] = template.Must(template.New("testcases_table.html").
 		Funcs(funcMap).
-		ParseFS(assets.TemplatesFS, "templates/testcases_table.html"))
+		ParseFS(assets.TemplatesFS, append(tableComponents, "templates/testcases_table.html")...))
 	templates["sessions_table.html"] = template.Must(template.New("sessions_table.html").
 		Funcs(funcMap).
-		ParseFS(assets.TemplatesFS, "templates/sessions_table.html"))
+		ParseFS(assets.TemplatesFS, append(tableComponents, "templates/sessions_table.html")...))
 	templates["groups_table.html"] = template.Must(template.New("groups_table.html").
 		Funcs(funcMap).
-		ParseFS(assets.TemplatesFS, "templates/groups_table.html"))
+		ParseFS(assets.TemplatesFS, append(tableComponents, "templates/groups_table.html")...))
 
 	e.Renderer = &Template{templates: templates}
 	e.Use(middleware.Logger())
