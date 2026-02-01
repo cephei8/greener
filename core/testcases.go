@@ -14,22 +14,9 @@ import (
 
 func TestcasesHandler(c echo.Context) error {
 	sess, _ := session.Get("session", c)
-	if auth, ok := sess.Values["authenticated"].(bool); !ok || !auth {
-		return c.Redirect(http.StatusFound, "/login")
-	}
+	auth, _ := sess.Values["authenticated"].(bool)
 
-	userIdStr, ok := sess.Values["user_id"].(string)
-	if !ok {
-		sess.Values["authenticated"] = false
-		sess.Save(c.Request(), c.Response())
-		return c.Redirect(http.StatusFound, "/login")
-	}
-
-	userId, err := uuid.Parse(userIdStr)
-	if err != nil {
-		c.Logger().Errorf("Invalid user_id in session: %v", err)
-		sess.Values["authenticated"] = false
-		sess.Save(c.Request(), c.Response())
+	if !auth && !AllowUnauthenticatedViewers(c) {
 		return c.Redirect(http.StatusFound, "/login")
 	}
 
@@ -47,7 +34,7 @@ func TestcasesHandler(c echo.Context) error {
 		templateName = "testcases_table.html"
 	}
 
-	result, err := svc.QueryTestcases(ctx, model_db.BinaryUUID(userId), QueryParams{
+	result, err := svc.QueryTestcases(ctx, model_db.BinaryUUID(uuid.Nil), QueryParams{
 		Query: queryStr,
 	})
 	if err != nil {
@@ -56,32 +43,20 @@ func TestcasesHandler(c echo.Context) error {
 	}
 
 	return c.Render(http.StatusOK, templateName, map[string]any{
-		"Testcases":    result.Results,
-		"LoadedCount":  len(result.Results),
-		"TotalRecords": result.TotalCount,
-		"Query":        queryStr,
-		"ActivePage":   "testcases",
+		"Testcases":       result.Results,
+		"LoadedCount":     len(result.Results),
+		"TotalRecords":    result.TotalCount,
+		"Query":           queryStr,
+		"ActivePage":      "testcases",
+		"IsAuthenticated": auth,
 	})
 }
 
 func TestcaseDetailHandler(c echo.Context) error {
 	sess, _ := session.Get("session", c)
-	if auth, ok := sess.Values["authenticated"].(bool); !ok || !auth {
-		return c.Redirect(http.StatusFound, "/login")
-	}
+	auth, _ := sess.Values["authenticated"].(bool)
 
-	userIdStr, ok := sess.Values["user_id"].(string)
-	if !ok {
-		sess.Values["authenticated"] = false
-		sess.Save(c.Request(), c.Response())
-		return c.Redirect(http.StatusFound, "/login")
-	}
-
-	userId, err := uuid.Parse(userIdStr)
-	if err != nil {
-		c.Logger().Errorf("Invalid user_id in session: %v", err)
-		sess.Values["authenticated"] = false
-		sess.Save(c.Request(), c.Response())
+	if !auth && !AllowUnauthenticatedViewers(c) {
 		return c.Redirect(http.StatusFound, "/login")
 	}
 
@@ -94,7 +69,7 @@ func TestcaseDetailHandler(c echo.Context) error {
 	svc := c.Get("queryService").(QueryServiceInterface)
 	ctx := context.Background()
 
-	result, err := svc.GetTestcase(ctx, model_db.BinaryUUID(userId), testcaseId)
+	result, err := svc.GetTestcase(ctx, model_db.BinaryUUID(uuid.Nil), testcaseId)
 	if err != nil {
 		c.Logger().Errorf("Failed to fetch testcase: %v", err)
 		return echo.NewHTTPError(http.StatusNotFound, "Testcase not found")
@@ -133,7 +108,8 @@ func TestcaseDetailHandler(c echo.Context) error {
 			"Output":    result.Output,
 			"CreatedAt": result.CreatedAt,
 		},
-		"Labels":     labelList,
-		"ActivePage": "testcases",
+		"Labels":          labelList,
+		"ActivePage":      "testcases",
+		"IsAuthenticated": auth,
 	})
 }

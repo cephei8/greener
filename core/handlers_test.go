@@ -11,7 +11,6 @@ import (
 
 "github.com/cephei8/greener/core"
 	model_api "github.com/cephei8/greener/core/model/api"
-	model_db "github.com/cephei8/greener/core/model/db"
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo/v4"
@@ -68,7 +67,7 @@ func TestTestcasesHandler_Success(t *testing.T) {
 	}
 
 	mockService.EXPECT().
-		QueryTestcases(mock.Anything, model_db.BinaryUUID(userID), core.QueryParams{Query: ""}).
+		QueryTestcases(mock.Anything, mock.Anything, core.QueryParams{Query: ""}).
 		Return(expectedResult, nil)
 
 	err := core.TestcasesHandler(c)
@@ -87,7 +86,7 @@ func TestTestcasesHandler_WithQuery(t *testing.T) {
 	}
 
 	mockService.EXPECT().
-		QueryTestcases(mock.Anything, model_db.BinaryUUID(userID), core.QueryParams{Query: `status="pass"`}).
+		QueryTestcases(mock.Anything, mock.Anything, core.QueryParams{Query: `status="pass"`}).
 		Return(expectedResult, nil)
 
 	err := core.TestcasesHandler(c)
@@ -101,7 +100,7 @@ func TestTestcasesHandler_QueryError(t *testing.T) {
 	c, rec, mockService := setupEchoContext(t, http.MethodGet, "/testcases", "", true, userID.String())
 
 	mockService.EXPECT().
-		QueryTestcases(mock.Anything, model_db.BinaryUUID(userID), core.QueryParams{Query: ""}).
+		QueryTestcases(mock.Anything, mock.Anything, core.QueryParams{Query: ""}).
 		Return(nil, errors.New("invalid query"))
 
 	err := core.TestcasesHandler(c)
@@ -132,7 +131,7 @@ func TestSessionsHandler_Success(t *testing.T) {
 	}
 
 	mockService.EXPECT().
-		QuerySessions(mock.Anything, model_db.BinaryUUID(userID), core.QueryParams{Query: ""}).
+		QuerySessions(mock.Anything, mock.Anything, core.QueryParams{Query: ""}).
 		Return(expectedResult, nil)
 
 	err := core.SessionsHandler(c)
@@ -146,7 +145,7 @@ func TestSessionsHandler_QueryError(t *testing.T) {
 	c, rec, mockService := setupEchoContext(t, http.MethodGet, "/sessions", "", true, userID.String())
 
 	mockService.EXPECT().
-		QuerySessions(mock.Anything, model_db.BinaryUUID(userID), core.QueryParams{Query: ""}).
+		QuerySessions(mock.Anything, mock.Anything, core.QueryParams{Query: ""}).
 		Return(nil, errors.New("query error"))
 
 	err := core.SessionsHandler(c)
@@ -169,7 +168,7 @@ func TestGroupsHandler_Success(t *testing.T) {
 	}
 
 	mockService.EXPECT().
-		QueryGroups(mock.Anything, model_db.BinaryUUID(userID), core.QueryParams{Query: query}).
+		QueryGroups(mock.Anything, mock.Anything, core.QueryParams{Query: query}).
 		Return(expectedResult, nil)
 
 	err := core.GroupsHandler(c)
@@ -194,7 +193,7 @@ func TestGroupsHandler_QueryError(t *testing.T) {
 	c, rec, mockService := setupEchoContext(t, http.MethodGet, "/groups?query="+url.QueryEscape(query), "", true, userID.String())
 
 	mockService.EXPECT().
-		QueryGroups(mock.Anything, model_db.BinaryUUID(userID), core.QueryParams{Query: query}).
+		QueryGroups(mock.Anything, mock.Anything, core.QueryParams{Query: query}).
 		Return(nil, errors.New("invalid query"))
 
 	err := core.GroupsHandler(c)
@@ -221,7 +220,7 @@ func TestTestcaseDetailHandler_Success(t *testing.T) {
 	}
 
 	mockService.EXPECT().
-		GetTestcase(mock.Anything, model_db.BinaryUUID(userID), testcaseID).
+		GetTestcase(mock.Anything, mock.Anything, testcaseID).
 		Return(expectedResult, nil)
 
 	err := core.TestcaseDetailHandler(c)
@@ -238,7 +237,7 @@ func TestTestcaseDetailHandler_NotFound(t *testing.T) {
 	c.SetParamValues(testcaseID.String())
 
 	mockService.EXPECT().
-		GetTestcase(mock.Anything, model_db.BinaryUUID(userID), testcaseID).
+		GetTestcase(mock.Anything, mock.Anything, testcaseID).
 		Return(nil, errors.New("not found"))
 
 	err := core.TestcaseDetailHandler(c)
@@ -279,7 +278,7 @@ func TestSessionDetailHandler_Success(t *testing.T) {
 	}
 
 	mockService.EXPECT().
-		GetSession(mock.Anything, model_db.BinaryUUID(userID), sessionID).
+		GetSession(mock.Anything, mock.Anything, sessionID).
 		Return(expectedResult, nil)
 
 	err := core.SessionDetailHandler(c)
@@ -296,7 +295,7 @@ func TestSessionDetailHandler_NotFound(t *testing.T) {
 	c.SetParamValues(sessionID.String())
 
 	mockService.EXPECT().
-		GetSession(mock.Anything, model_db.BinaryUUID(userID), sessionID).
+		GetSession(mock.Anything, mock.Anything, sessionID).
 		Return(nil, errors.New("not found"))
 
 	err := core.SessionDetailHandler(c)
