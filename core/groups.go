@@ -14,22 +14,9 @@ import (
 
 func GroupsHandler(c echo.Context) error {
 	sess, _ := session.Get("session", c)
-	if auth, ok := sess.Values["authenticated"].(bool); !ok || !auth {
-		return c.Redirect(http.StatusFound, "/login")
-	}
+	auth, _ := sess.Values["authenticated"].(bool)
 
-	userIdStr, ok := sess.Values["user_id"].(string)
-	if !ok {
-		sess.Values["authenticated"] = false
-		sess.Save(c.Request(), c.Response())
-		return c.Redirect(http.StatusFound, "/login")
-	}
-
-	userId, err := uuid.Parse(userIdStr)
-	if err != nil {
-		c.Logger().Errorf("Invalid user_id in session: %v", err)
-		sess.Values["authenticated"] = false
-		sess.Save(c.Request(), c.Response())
+	if !auth && !AllowUnauthenticatedViewers(c) {
 		return c.Redirect(http.StatusFound, "/login")
 	}
 
@@ -49,15 +36,16 @@ func GroupsHandler(c echo.Context) error {
 
 	if queryStr == "" {
 		return c.Render(http.StatusOK, templateName, map[string]any{
-			"Groups":       []model_api.Group{},
-			"LoadedCount":  0,
-			"TotalRecords": 0,
-			"Query":        "",
-			"ActivePage":   "groups",
+			"Groups":          []model_api.Group{},
+			"LoadedCount":     0,
+			"TotalRecords":    0,
+			"Query":           "",
+			"ActivePage":      "groups",
+			"IsAuthenticated": auth,
 		})
 	}
 
-	result, err := svc.QueryGroups(ctx, model_db.BinaryUUID(userId), QueryParams{
+	result, err := svc.QueryGroups(ctx, model_db.BinaryUUID(uuid.Nil), QueryParams{
 		Query: queryStr,
 	})
 	if err != nil {
@@ -66,10 +54,11 @@ func GroupsHandler(c echo.Context) error {
 	}
 
 	return c.Render(http.StatusOK, templateName, map[string]any{
-		"Groups":       result.Results,
-		"LoadedCount":  len(result.Results),
-		"TotalRecords": result.TotalCount,
-		"Query":        queryStr,
-		"ActivePage":   "groups",
+		"Groups":          result.Results,
+		"LoadedCount":     len(result.Results),
+		"TotalRecords":    result.TotalCount,
+		"Query":           queryStr,
+		"ActivePage":      "groups",
+		"IsAuthenticated": auth,
 	})
 }

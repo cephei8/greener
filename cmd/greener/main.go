@@ -23,11 +23,12 @@ import (
 )
 
 type Config struct {
-	DatabaseURL string `env:"GREENER_DATABASE_URL"`
-	AuthSecret  string `env:"GREENER_AUTH_SECRET"`
-	AuthIssuer  string `env:"GREENER_AUTH_ISSUER"`
-	Port        int    `env:"GREENER_PORT" envDefault:"8080"`
-	Verbose     bool   `env:"GREENER_VERBOSE_OUTPUT"`
+	DatabaseURL                 string `env:"GREENER_DATABASE_URL"`
+	AuthSecret                  string `env:"GREENER_AUTH_SECRET"`
+	AuthIssuer                  string `env:"GREENER_AUTH_ISSUER"`
+	Port                        int    `env:"GREENER_PORT" envDefault:"8080"`
+	Verbose                     bool   `env:"GREENER_VERBOSE_OUTPUT"`
+	AllowUnauthenticatedViewers bool   `env:"GREENER_ALLOW_UNAUTHENTICATED_VIEWERS"`
 }
 
 type Template struct {
@@ -50,9 +51,10 @@ func main() {
 
 	flag.StringVar(&cfg.DatabaseURL, "db-url", cfg.DatabaseURL, "Database URL")
 	flag.StringVar(&cfg.AuthSecret, "auth-secret", cfg.AuthSecret, "Authentication secret key")
-	flag.StringVar(&cfg.AuthIssuer, "base-url", cfg.AuthIssuer, "External base URL (only needed when behind a proxy)")
+	flag.StringVar(&cfg.AuthIssuer, "base-url", cfg.AuthIssuer, "External base URL")
 	flag.IntVar(&cfg.Port, "port", cfg.Port, "Port to listen on")
 	flag.BoolVar(&cfg.Verbose, "verbose", cfg.Verbose, "Enable verbose output")
+	flag.BoolVar(&cfg.AllowUnauthenticatedViewers, "allow-unauthenticated-viewers", cfg.AllowUnauthenticatedViewers, "Allow unauthenticated users to view data")
 	flag.Parse()
 
 	issuer := cfg.AuthIssuer
@@ -152,6 +154,7 @@ func main() {
 		return func(c echo.Context) error {
 			c.Set("db", db)
 			c.Set("queryService", queryService)
+			c.Set("allowUnauthenticatedViewers", cfg.AllowUnauthenticatedViewers)
 			return next(c)
 		}
 	})

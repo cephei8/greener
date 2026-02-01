@@ -9,7 +9,7 @@
                 <li><a href="/sessions"{{if eq .ActivePage "sessions"}} class="menu-active"{{end}}>Sessions</a></li>
                 <li><a href="/testcases"{{if eq .ActivePage "testcases"}} class="menu-active"{{end}}>Testcases</a></li>
                 <li><a href="/groups"{{if eq .ActivePage "groups"}} class="menu-active"{{end}}>Groups</a></li>
-                <li><a href="/api-keys"{{if eq .ActivePage "apikeys"}} class="menu-active"{{end}}>API Keys</a></li>
+                {{if .IsAuthenticated}}<li><a href="/api-keys"{{if eq .ActivePage "apikeys"}} class="menu-active"{{end}}>API Keys</a></li>{{end}}
             </ul>
         </div>
         <a href="/sessions" class="btn btn-ghost text-xl">Greener</a>
@@ -19,15 +19,19 @@
             <li><a href="/sessions"{{if eq .ActivePage "sessions"}} class="menu-active"{{end}}>Sessions</a></li>
             <li><a href="/testcases"{{if eq .ActivePage "testcases"}} class="menu-active"{{end}}>Testcases</a></li>
             <li><a href="/groups"{{if eq .ActivePage "groups"}} class="menu-active"{{end}}>Groups</a></li>
-            <li><a href="/api-keys"{{if eq .ActivePage "apikeys"}} class="menu-active"{{end}}>API Keys</a></li>
+            {{if .IsAuthenticated}}<li><a href="/api-keys"{{if eq .ActivePage "apikeys"}} class="menu-active"{{end}}>API Keys</a></li>{{end}}
         </ul>
     </div>
     <div class="navbar-end gap-2">
+        {{if .IsAuthenticated}}
         <button id="mcp-tab-btn" onclick="toggleMCPTab()" class="btn btn-ghost btn-sm gap-1" title="Set this tab as MCP target">
             <span data-icon="radio" data-icon-class="h-4 w-4"></span>
             <span id="mcp-tab-label">MCP tab</span>
         </button>
         <a href="#" hx-post="/logout" class="btn">Logout</a>
+        {{else}}
+        <a href="/login" class="btn btn-primary">Login</a>
+        {{end}}
     </div>
 </div>
 {{end}}

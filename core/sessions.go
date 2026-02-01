@@ -14,22 +14,9 @@ import (
 
 func SessionsHandler(c echo.Context) error {
 	sess, _ := session.Get("session", c)
-	if auth, ok := sess.Values["authenticated"].(bool); !ok || !auth {
-		return c.Redirect(http.StatusFound, "/login")
-	}
+	auth, _ := sess.Values["authenticated"].(bool)
 
-	userIdStr, ok := sess.Values["user_id"].(string)
-	if !ok {
-		sess.Values["authenticated"] = false
-		sess.Save(c.Request(), c.Response())
-		return c.Redirect(http.StatusFound, "/login")
-	}
-
-	userId, err := uuid.Parse(userIdStr)
-	if err != nil {
-		c.Logger().Errorf("Invalid user_id in session: %v", err)
-		sess.Values["authenticated"] = false
-		sess.Save(c.Request(), c.Response())
+	if !auth && !AllowUnauthenticatedViewers(c) {
 		return c.Redirect(http.StatusFound, "/login")
 	}
 
@@ -40,7 +27,6 @@ func SessionsHandler(c echo.Context) error {
 	if queryStr == "" {
 		queryStr = c.QueryParam("query")
 	}
-	c.Logger().Infof("Sessions handler called, queryStr='%s', userID=%s", queryStr, userId)
 
 	isHTMX := c.Request().Header.Get("HX-Request") == "true"
 	templateName := "sessions.html"
@@ -48,7 +34,7 @@ func SessionsHandler(c echo.Context) error {
 		templateName = "sessions_table.html"
 	}
 
-	result, err := svc.QuerySessions(ctx, model_db.BinaryUUID(userId), QueryParams{
+	result, err := svc.QuerySessions(ctx, model_db.BinaryUUID(uuid.Nil), QueryParams{
 		Query: queryStr,
 	})
 	if err != nil {
@@ -64,34 +50,21 @@ func SessionsHandler(c echo.Context) error {
 		}
 	}
 
-	c.Logger().Infof("Returning %d sessions, totalCount=%d, template=%s", len(sessions), result.TotalCount, templateName)
 	return c.Render(http.StatusOK, templateName, map[string]any{
-		"Sessions":     sessions,
-		"LoadedCount":  len(sessions),
-		"TotalRecords": result.TotalCount,
-		"Query":        queryStr,
-		"ActivePage":   "sessions",
+		"Sessions":        sessions,
+		"LoadedCount":     len(sessions),
+		"TotalRecords":    result.TotalCount,
+		"Query":           queryStr,
+		"ActivePage":      "sessions",
+		"IsAuthenticated": auth,
 	})
 }
 
 func SessionDetailHandler(c echo.Context) error {
 	sess, _ := session.Get("session", c)
-	if auth, ok := sess.Values["authenticated"].(bool); !ok || !auth {
-		return c.Redirect(http.StatusFound, "/login")
-	}
+	auth, _ := sess.Values["authenticated"].(bool)
 
-	userIdStr, ok := sess.Values["user_id"].(string)
-	if !ok {
-		sess.Values["authenticated"] = false
-		sess.Save(c.Request(), c.Response())
-		return c.Redirect(http.StatusFound, "/login")
-	}
-
-	userId, err := uuid.Parse(userIdStr)
-	if err != nil {
-		c.Logger().Errorf("Invalid user_id in session: %v", err)
-		sess.Values["authenticated"] = false
-		sess.Save(c.Request(), c.Response())
+	if !auth && !AllowUnauthenticatedViewers(c) {
 		return c.Redirect(http.StatusFound, "/login")
 	}
 
@@ -104,7 +77,7 @@ func SessionDetailHandler(c echo.Context) error {
 	svc := c.Get("queryService").(QueryServiceInterface)
 	ctx := context.Background()
 
-	result, err := svc.GetSession(ctx, model_db.BinaryUUID(userId), sessionId)
+	result, err := svc.GetSession(ctx, model_db.BinaryUUID(uuid.Nil), sessionId)
 	if err != nil {
 		c.Logger().Errorf("Failed to fetch session: %v", err)
 		return echo.NewHTTPError(http.StatusNotFound, "Session not found")
@@ -138,7 +111,8 @@ func SessionDetailHandler(c echo.Context) error {
 			"Baggage":     baggageStr,
 			"CreatedAt":   result.CreatedAt,
 		},
-		"Labels":     labelList,
-		"ActivePage": "sessions",
+		"Labels":          labelList,
+		"ActivePage":      "sessions",
+		"IsAuthenticated": auth,
 	})
 }

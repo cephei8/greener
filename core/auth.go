@@ -90,3 +90,10 @@ func GetUserId(c echo.Context) model_db.BinaryUUID {
 	}
 	return model_db.BinaryUUID(uuid.Nil)
 }
+
+func AllowUnauthenticatedViewers(c echo.Context) bool {
+	if allow, ok := c.Get("allowUnauthenticatedViewers").(bool); ok {
+		return allow
+	}
+	return false
+}

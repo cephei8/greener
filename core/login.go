@@ -19,6 +19,10 @@ func IndexHandler(c echo.Context) error {
 		return c.Redirect(http.StatusFound, "/sessions")
 	}
 
+	if AllowUnauthenticatedViewers(c) {
+		return c.Redirect(http.StatusFound, "/sessions")
+	}
+
 	return c.Redirect(http.StatusFound, "/login")
 }
 
