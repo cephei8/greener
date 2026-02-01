@@ -144,7 +144,7 @@ func (h *IngressHandler) CreateTestcases(c echo.Context) error {
 		var session model_db.Session
 		err = h.db.NewSelect().
 			Model(&session).
-			Where("id = ?", model_db.BinaryUUID(sessionID)).
+			Where("? = ?", bun.Ident("id"), model_db.BinaryUUID(sessionID)).
 			Scan(ctx)
 		if err != nil {
 			if err.Error() == "sql: no rows in result set" {

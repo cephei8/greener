@@ -55,7 +55,7 @@ func APIKeyAuth(db *bun.DB) echo.MiddlewareFunc {
 			var apiKey model_db.APIKey
 			err = db.NewSelect().
 				Model(&apiKey).
-				Where("id = ?", model_db.BinaryUUID(apiKeyID)).
+				Where("? = ?", bun.Ident("id"), model_db.BinaryUUID(apiKeyID)).
 				Scan(context.Background())
 			if err != nil {
 				c.Logger().Errorf("Failed to find API key %s: %v", apiKeyID, err)

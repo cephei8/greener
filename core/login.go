@@ -43,7 +43,7 @@ func LoginHandler(c echo.Context) error {
 	var user model_db.User
 	err := db.NewSelect().
 		Model(&user).
-		Where("username = ?", username).
+		Where("? = ?", bun.Ident("username"), username).
 		Scan(ctx)
 	if err != nil {
 		c.Logger().Errorf("Failed to find user %s: %v", username, err)

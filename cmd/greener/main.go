@@ -13,6 +13,9 @@ import (
 	"github.com/cephei8/greener/assets"
 	"github.com/cephei8/greener/core"
 	"github.com/cephei8/greener/core/dbutil"
+	"github.com/cephei8/greener/core/mcp"
+	"github.com/cephei8/greener/core/oauth"
+	"github.com/cephei8/greener/core/sse"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
@@ -22,6 +25,7 @@ import (
 type Config struct {
 	DatabaseURL string `env:"GREENER_DATABASE_URL"`
 	AuthSecret  string `env:"GREENER_AUTH_SECRET"`
+	AuthIssuer  string `env:"GREENER_AUTH_ISSUER"`
 	Port        int    `env:"GREENER_PORT" envDefault:"8080"`
 	Verbose     bool   `env:"GREENER_VERBOSE_OUTPUT"`
 }
@@ -46,9 +50,15 @@ func main() {
 
 	flag.StringVar(&cfg.DatabaseURL, "db-url", cfg.DatabaseURL, "Database URL")
 	flag.StringVar(&cfg.AuthSecret, "auth-secret", cfg.AuthSecret, "Authentication secret key")
+	flag.StringVar(&cfg.AuthIssuer, "base-url", cfg.AuthIssuer, "External base URL (only needed when behind a proxy)")
 	flag.IntVar(&cfg.Port, "port", cfg.Port, "Port to listen on")
 	flag.BoolVar(&cfg.Verbose, "verbose", cfg.Verbose, "Enable verbose output")
 	flag.Parse()
+
+	issuer := cfg.AuthIssuer
+	if issuer == "" {
+		issuer = fmt.Sprintf("http://localhost:%d", cfg.Port)
+	}
 
 	if cfg.DatabaseURL == "" {
 		fmt.Fprintf(os.Stderr, "Error: database URL is required\n")
@@ -73,6 +83,13 @@ func main() {
 		os.Exit(1)
 	}
 	defer db.Close()
+
+	oauthServer := oauth.NewServer(db, issuer)
+
+	sseHub := sse.NewHub()
+	go sseHub.Run()
+
+	mcpServer := mcp.NewMCPServer(db, sseHub)
 
 	e := echo.New()
 
@@ -110,8 +127,10 @@ func main() {
 	templates["apikeys.html"] = template.Must(template.New("").
 		Funcs(funcMap).
 		ParseFS(assets.TemplatesFS, append(componentTemplates, "templates/apikeys.html")...))
+	templates["oauth_authorize.html"] = template.Must(template.New("").
+		Funcs(funcMap).
+		ParseFS(assets.TemplatesFS, append(componentTemplates, "templates/oauth_authorize.html")...))
 
-	// Table templates (HTMX partials) - include status_icon component
 	tableComponents := []string{"templates/components/status_icon.html"}
 	templates["testcases_table.html"] = template.Must(template.New("testcases_table.html").
 		Funcs(funcMap).
@@ -123,21 +142,33 @@ func main() {
 		Funcs(funcMap).
 		ParseFS(assets.TemplatesFS, append(tableComponents, "templates/groups_table.html")...))
 
+	queryService := core.NewQueryService(db)
+
 	e.Renderer = &Template{templates: templates}
-	e.Use(middleware.Logger())
+	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
 	e.Use(session.Middleware(sessions.NewCookieStore([]byte(cfg.AuthSecret))))
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			c.Set("db", db)
+			c.Set("queryService", queryService)
 			return next(c)
 		}
 	})
 
 	e.GET("/static/*", echo.WrapHandler(http.FileServer(http.FS(assets.StaticFS))))
+
 	e.GET("/", core.IndexHandler)
 	e.GET("/login", core.LoginPageHandler)
 	e.POST("/login", core.LoginHandler)
+	e.POST("/logout", core.LogoutHandler)
+
+	e.GET("/.well-known/oauth-authorization-server", oauthServer.MetadataHandler)
+	e.GET("/oauth/authorize", oauthServer.AuthorizePageHandler)
+	e.POST("/oauth/authorize", oauthServer.AuthorizeHandler)
+	e.POST("/oauth/token", oauthServer.TokenHandler)
+	e.POST("/oauth/register", oauthServer.RegisterHandler)
+
 	e.GET("/testcases", core.TestcasesHandler)
 	e.POST("/testcases/query", core.TestcasesHandler)
 	e.GET("/testcases/:id/details", core.TestcaseDetailHandler)
@@ -149,10 +180,12 @@ func main() {
 	e.GET("/api-keys", core.APIKeysHandler)
 	e.POST("/api-keys/create", core.CreateAPIKeyHandler)
 	e.DELETE("/api-keys/:id", core.DeleteAPIKeyHandler)
-	e.POST("/logout", core.LogoutHandler)
+
+	apiV1 := e.Group("/api/v1")
+	apiV1.GET("/sse/events", sse.NewHandler(sseHub))
+	apiV1.Any("/mcp", mcpServer.EchoHandler(), oauthServer.BearerAuthMiddleware())
 
 	ingressHandler := core.NewIngressHandler(db)
-	apiV1 := e.Group("/api/v1")
 	apiV1Ingress := apiV1.Group("/ingress", core.APIKeyAuth(db))
 	apiV1Ingress.POST("/sessions", ingressHandler.CreateSession)
 	apiV1Ingress.POST("/testcases", ingressHandler.CreateTestcases)

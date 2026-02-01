@@ -1,0 +1,7 @@
+packages:
+  github.com/cephei8/greener/core:
+    config:
+      dir: "{{.InterfaceDir}}"
+      filename: query_service_mock.go
+    interfaces:
+      QueryServiceInterface:

@@ -20,6 +20,7 @@
             gotools
             go-tools
             golangci-lint
+            go-mockery
 
             gcc
             pkg-config

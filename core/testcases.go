@@ -6,13 +6,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/cephei8/greener/core/model/api"
-	"github.com/cephei8/greener/core/model/db"
-	"github.com/cephei8/greener/core/query"
+	model_db "github.com/cephei8/greener/core/model/db"
 	"github.com/google/uuid"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
-	"github.com/uptrace/bun"
 )
 
 func TestcasesHandler(c echo.Context) error {
@@ -36,7 +33,7 @@ func TestcasesHandler(c echo.Context) error {
 		return c.Redirect(http.StatusFound, "/login")
 	}
 
-	db := c.Get("db").(*bun.DB)
+	svc := c.Get("queryService").(QueryServiceInterface)
 	ctx := context.Background()
 
 	queryStr := c.FormValue("query")
@@ -50,77 +47,18 @@ func TestcasesHandler(c echo.Context) error {
 		templateName = "testcases_table.html"
 	}
 
-	var queryAST query.Query
-	if queryStr != "" {
-		parser := query.NewParser(queryStr)
-		parsedQuery, err := parser.Parse()
-		if err != nil {
-			c.Response().Header().Set("Content-Type", "text/html")
-			return c.HTML(http.StatusBadRequest, fmt.Sprintf("<span>Invalid query: %v</span>", err))
-		}
-
-		if err := query.Validate(parsedQuery, query.QueryTypeTestcase); err != nil {
-			c.Response().Header().Set("Content-Type", "text/html")
-			return c.HTML(http.StatusBadRequest, fmt.Sprintf("<span>Invalid query: %v</span>", err))
-		}
-
-		queryAST = parsedQuery
-	}
-
-	q, err := BuildTestcasesQuery(db, model_db.BinaryUUID(userId), queryAST)
+	result, err := svc.QueryTestcases(ctx, model_db.BinaryUUID(userId), QueryParams{
+		Query: queryStr,
+	})
 	if err != nil {
 		c.Response().Header().Set("Content-Type", "text/html")
-		return c.HTML(http.StatusBadRequest, fmt.Sprintf("<span>Invalid query: %v</span>", err))
-	}
-
-	type TestcaseResult struct {
-		model_db.Testcase
-		TotalCount       int64 `bun:"total_count"`
-		AggregatedStatus int64 `bun:"aggregated_status"`
-	}
-
-	var results []TestcaseResult
-	err = q.Scan(ctx, &results)
-	if err != nil {
-		c.Logger().Errorf("Failed to execute query: %v", err)
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to execute query")
-	}
-
-	testcases := []model_api.Testcase{}
-	totalCount := 0
-
-	for _, result := range results {
-		if totalCount == 0 && result.TotalCount > 0 {
-			totalCount = int(result.TotalCount)
-		}
-
-		testcaseID, err := uuid.FromBytes(result.ID[:])
-		if err != nil {
-			c.Logger().Errorf("Failed to parse testcase UUID: %v", err)
-			continue
-		}
-
-		sessionID, err := uuid.FromBytes(result.SessionID[:])
-		if err != nil {
-			c.Logger().Errorf("Failed to parse session UUID: %v", err)
-			continue
-		}
-
-		status := TestcaseStatusToString(result.Status)
-
-		testcases = append(testcases, model_api.Testcase{
-			ID:        testcaseID.String(),
-			SessionID: sessionID.String(),
-			Name:      result.Name,
-			Status:    status,
-			CreatedAt: result.CreatedAt.Format("2006-01-02 15:04:05"),
-		})
+		return c.HTML(http.StatusBadRequest, fmt.Sprintf("<span>%v</span>", err))
 	}
 
 	return c.Render(http.StatusOK, templateName, map[string]any{
-		"Testcases":    testcases,
-		"LoadedCount":  len(testcases),
-		"TotalRecords": totalCount,
+		"Testcases":    result.Results,
+		"LoadedCount":  len(result.Results),
+		"TotalRecords": result.TotalCount,
 		"Query":        queryStr,
 		"ActivePage":   "testcases",
 	})
@@ -153,81 +91,34 @@ func TestcaseDetailHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid testcase ID")
 	}
 
-	db := c.Get("db").(*bun.DB)
+	svc := c.Get("queryService").(QueryServiceInterface)
 	ctx := context.Background()
 
-	var testcase model_db.Testcase
-	err = db.NewSelect().
-		Model(&testcase).
-		Where("? = ?", bun.Ident("id"), model_db.BinaryUUID(testcaseId)).
-		Where("? = ?", bun.Ident("user_id"), model_db.BinaryUUID(userId)).
-		Scan(ctx)
-
+	result, err := svc.GetTestcase(ctx, model_db.BinaryUUID(userId), testcaseId)
 	if err != nil {
 		c.Logger().Errorf("Failed to fetch testcase: %v", err)
 		return echo.NewHTTPError(http.StatusNotFound, "Testcase not found")
 	}
 
-	testcaseIDStr, err := uuid.FromBytes(testcase.ID[:])
-	if err != nil {
-		c.Logger().Errorf("Failed to parse testcase UUID: %v", err)
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to parse testcase ID")
-	}
-
-	sessionIDStr, err := uuid.FromBytes(testcase.SessionID[:])
-	if err != nil {
-		c.Logger().Errorf("Failed to parse session UUID: %v", err)
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to parse session ID")
-	}
-
-	status := TestcaseStatusToString(testcase.Status)
-
 	var baggageStr string
-	if testcase.Baggage != nil {
-		var baggageData interface{}
-		if err := json.Unmarshal(testcase.Baggage, &baggageData); err == nil {
-			if formatted, err := json.MarshalIndent(baggageData, "", "  "); err == nil {
-				baggageStr = string(formatted)
-			} else {
-				baggageStr = string(testcase.Baggage)
-			}
-		} else {
-			baggageStr = string(testcase.Baggage)
+	if result.Baggage != nil {
+		if formatted, err := json.MarshalIndent(result.Baggage, "", "  "); err == nil {
+			baggageStr = string(formatted)
 		}
-	}
-
-	var outputStr string
-	if testcase.Output != nil {
-		outputStr = *testcase.Output
-	}
-
-	var classnameStr string
-	if testcase.Classname != nil {
-		classnameStr = *testcase.Classname
-	}
-
-	var fileStr string
-	if testcase.File != nil {
-		fileStr = *testcase.File
-	}
-
-	var testsuiteStr string
-	if testcase.Testsuite != nil {
-		testsuiteStr = *testcase.Testsuite
 	}
 
 	return c.Render(http.StatusOK, "testcase_detail.html", map[string]any{
 		"Testcase": map[string]any{
-			"ID":        testcaseIDStr.String(),
-			"SessionID": sessionIDStr.String(),
-			"Name":      testcase.Name,
-			"Classname": classnameStr,
-			"File":      fileStr,
-			"Testsuite": testsuiteStr,
-			"Status":    status,
+			"ID":        result.ID,
+			"SessionID": result.SessionID,
+			"Name":      result.Name,
+			"Classname": result.Classname,
+			"File":      result.File,
+			"Testsuite": result.Testsuite,
+			"Status":    result.Status,
 			"Baggage":   baggageStr,
-			"Output":    outputStr,
-			"CreatedAt": testcase.CreatedAt.Format("2006-01-02 15:04:05"),
+			"Output":    result.Output,
+			"CreatedAt": result.CreatedAt,
 		},
 		"ActivePage": "testcases",
 	})

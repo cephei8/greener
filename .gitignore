@@ -3,6 +3,8 @@
 /.direnv
 /greener
 /greener-admin
+/cmd/greener/greener
+/cmd/greener/greener-admin
 
 /greener.db
 /greener.db-shm
