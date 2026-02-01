@@ -25,6 +25,9 @@ Check out [Greener Documentation](https://greener.cephei8.dev) for details.
 Demo:
 ![Demo](./docs/content/assets/demo.gif)
 
+Demo of AI agent using Greener via MCP:
+![Demo - MCP](./docs/content/assets/demo_mcp.gif)
+
 ## Usage
 
 ### Docker
