@@ -318,7 +318,6 @@ func (s *QueryService) GetTestcase(ctx context.Context, userID model_db.BinaryUU
 	err := s.db.NewSelect().
 		Model(&testcase).
 		Where("? = ?", bun.Ident("id"), model_db.BinaryUUID(testcaseID)).
-		Where("? = ?", bun.Ident("user_id"), userID).
 		Scan(ctx)
 
 	if err != nil {
@@ -359,7 +358,6 @@ func (s *QueryService) GetTestcase(ctx context.Context, userID model_db.BinaryUU
 	err = s.db.NewSelect().
 		Model(&labels).
 		Where("? = ?", bun.Ident("session_id"), testcase.SessionID).
-		Where("? = ?", bun.Ident("user_id"), userID).
 		OrderBy("key", bun.OrderAsc).
 		Scan(ctx)
 
@@ -390,7 +388,6 @@ func (s *QueryService) GetSession(ctx context.Context, userID model_db.BinaryUUI
 		ColumnExpr("MIN(?) AS ?", bun.Ident("testcases.status"), bun.Ident("aggregated_status")).
 		Join("LEFT JOIN ? ON ? = ?", bun.Ident("testcases"), bun.Ident("sessions.id"), bun.Ident("testcases.session_id")).
 		Where("? = ?", bun.Ident("sessions.id"), model_db.BinaryUUID(sessionID)).
-		Where("? = ?", bun.Ident("sessions.user_id"), userID).
 		Group("sessions.id").
 		Scan(ctx, &sessionData)
 
@@ -426,7 +423,6 @@ func (s *QueryService) GetSession(ctx context.Context, userID model_db.BinaryUUI
 	err = s.db.NewSelect().
 		Model(&labels).
 		Where("? = ?", bun.Ident("session_id"), model_db.BinaryUUID(sessionID)).
-		Where("? = ?", bun.Ident("user_id"), userID).
 		OrderBy("key", bun.OrderAsc).
 		Scan(ctx)
 

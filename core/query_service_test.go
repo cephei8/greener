@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/cephei8/greener/core"
-	"github.com/cephei8/greener/core/model/db"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -474,19 +473,6 @@ func (s *BaseSuite) TestQueryServiceGetTestcase() {
 	}
 }
 
-func (s *BaseSuite) TestQueryServiceGetTestcaseWrongUser() {
-	ctx := context.Background()
-	svc := core.NewQueryService(s.db)
-
-	wrongUserID := model_db.BinaryUUID(uuid.New())
-
-	result, err := svc.GetTestcase(ctx, wrongUserID, s.testcase1Id)
-
-	require.Error(s.T(), err)
-	assert.Nil(s.T(), result)
-	assert.Contains(s.T(), err.Error(), "not found")
-}
-
 func (s *BaseSuite) TestQueryServiceGetSession() {
 	tests := []struct {
 		name        string
@@ -566,19 +552,6 @@ func (s *BaseSuite) TestQueryServiceGetSession() {
 			}
 		})
 	}
-}
-
-func (s *BaseSuite) TestQueryServiceGetSessionWrongUser() {
-	ctx := context.Background()
-	svc := core.NewQueryService(s.db)
-
-	wrongUserID := model_db.BinaryUUID(uuid.New())
-
-	result, err := svc.GetSession(ctx, wrongUserID, s.session1Id)
-
-	require.Error(s.T(), err)
-	assert.Nil(s.T(), result)
-	assert.Contains(s.T(), err.Error(), "not found")
 }
 
 func (s *BaseSuite) TestQueryServiceQueryTestcasesFilterBySession() {
