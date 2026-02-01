@@ -61,7 +61,8 @@
     font-weight: bold;
 }
 .token.operator {
-    color: #6b7280 !important;
+    color: inherit !important;
+    background: none !important;
 }
 .token.status {
     color: #16a34a !important;

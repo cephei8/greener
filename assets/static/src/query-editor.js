@@ -7,7 +7,7 @@ if (typeof Prism !== "undefined") {
         identifier:
             /\b(?:session_id|id|name|status|classname|testsuite|file)\b/i,
         status: /\b(?:pass|fail|error|skip)\b/i,
-        operator: /[!=]=?/,
+        operator: /!=|=/,
         punctuation: /[(),]/,
     };
 }

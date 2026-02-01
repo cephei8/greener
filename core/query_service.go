@@ -50,6 +50,7 @@ type TestcaseDetail struct {
 	Testsuite string
 	Output    string
 	Baggage   any
+	Labels    map[string]string
 	CreatedAt string
 }
 
@@ -351,6 +352,25 @@ func (s *QueryService) GetTestcase(ctx context.Context, userID model_db.BinaryUU
 		var baggage any
 		if err := json.Unmarshal(testcase.Baggage, &baggage); err == nil {
 			result.Baggage = baggage
+		}
+	}
+
+	var labels []model_db.Label
+	err = s.db.NewSelect().
+		Model(&labels).
+		Where("? = ?", bun.Ident("session_id"), testcase.SessionID).
+		Where("? = ?", bun.Ident("user_id"), userID).
+		OrderBy("key", bun.OrderAsc).
+		Scan(ctx)
+
+	if err == nil && len(labels) > 0 {
+		result.Labels = make(map[string]string)
+		for _, label := range labels {
+			if label.Value != nil {
+				result.Labels[label.Key] = *label.Value
+			} else {
+				result.Labels[label.Key] = ""
+			}
 		}
 	}
 

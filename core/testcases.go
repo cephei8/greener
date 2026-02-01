@@ -107,6 +107,19 @@ func TestcaseDetailHandler(c echo.Context) error {
 		}
 	}
 
+	type LabelData struct {
+		Key   string
+		Value string
+	}
+
+	labelList := []LabelData{}
+	for k, v := range result.Labels {
+		labelList = append(labelList, LabelData{
+			Key:   k,
+			Value: v,
+		})
+	}
+
 	return c.Render(http.StatusOK, "testcase_detail.html", map[string]any{
 		"Testcase": map[string]any{
 			"ID":        result.ID,
@@ -120,6 +133,7 @@ func TestcaseDetailHandler(c echo.Context) error {
 			"Output":    result.Output,
 			"CreatedAt": result.CreatedAt,
 		},
+		"Labels":     labelList,
 		"ActivePage": "testcases",
 	})
 }
