@@ -1,5 +1,5 @@
 ############################################################
-FROM golang:1.25-trixie AS build
+FROM golang:1.26-trixie AS build
 
 RUN apt-get update && apt-get install -y nodejs npm
 
