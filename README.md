@@ -44,7 +44,7 @@ docker run --rm \
     cephei8/greener:latest
 
 # create user (--role: editor or viewer, default: viewer)
-go install github.com/cephei8/greener/cmd/greener-admin@main
+go install git.sr.ht/~cephei8/greener/cmd/greener-admin@main
 
 greener-admin \
     --db-url sqlite:///greener-data/greener.db \
@@ -57,7 +57,7 @@ greener-admin \
 Then open <http://localhost:8080> in your browser.
 
 #### Docker Compose
-Check out [compose.yaml](https://github.com/cephei8/greener/blob/main/compose.yaml) for example of using Docker Compose and PostgreSQL.
+Check out [compose.yaml](https://git.sr.ht/~cephei8/greener/tree/main/item/compose.yaml) for example of using Docker Compose and PostgreSQL.
 
 ### Building from source
 
@@ -73,7 +73,7 @@ mkdir greener-data
 ./greener --db-url "sqlite:///greener-data/greener.db" --auth-secret "my-secret"
 
 # create user (--role: editor or viewer, default: viewer)
-go install github.com/cephei8/greener/cmd/greener-admin@main
+go install git.sr.ht/~cephei8/greener/cmd/greener-admin@main
 
 greener-admin \
     --db-url sqlite:///greener-data/greener.db \
@@ -89,22 +89,22 @@ Then open <http://localhost:8080> in your browser.
 
 Check out [Ecosystem section](#ecosystem) for ways to report test results to Greener.
 
-For the "hello world" the easiest option may be to use [cephei8/greener-reporter-cli](https://github.com/cephei8/greener-reporter-cli).
+For the "hello world" the easiest option may be to use [~cephei8/greener-reporter-cli](https://git.sr.ht/~cephei8/greener-reporter-cli).
 
 ## Ecosystem
 
 Plugins/reporters:
-- pytest plugin: [cephei8/pytest-greener](https://github.com/cephei8/pytest-greener)
-- Jest reporter: [cephei8/jest-greener](https://github.com/cephei8/jest-greener)
-- Mocha reporter: [cephei8/mocha-greener](https://github.com/cephei8/mocha-greener)
-- Tool to report Go test results: [cephei8/greener-reporter-go](https://github.com/cephei8/greener-reporter-go)
-- Tool to report JUnit XML results: [cephei8/greener-reporter-junitxml](https://github.com/cephei8/greener-reporter-junitxml)
-- CLI tool to report test results: [cephei8/greener-reporter-cli](https://github.com/cephei8/greener-reporter-cli)
+- pytest plugin: [~cephei8/pytest-greener](https://git.sr.ht/~cephei8/pytest-greener)
+- Jest reporter: [~cephei8/jest-greener](https://git.sr.ht/~cephei8/jest-greener)
+- Mocha reporter: [~cephei8/mocha-greener](https://git.sr.ht/~cephei8/mocha-greener)
+- Tool to report Go test results: [~cephei8/greener-reporter-go](https://git.sr.ht/~cephei8/greener-reporter-go)
+- Tool to report JUnit XML results: [~cephei8/greener-reporter-junitxml](https://git.sr.ht/~cephei8/greener-reporter-junitxml)
+- CLI tool to report test results: [~cephei8/greener-reporter-cli](https://git.sr.ht/~cephei8/greener-reporter-cli)
 
 Supporting libraries:
-- Python library for implementing reporters: [cephei8/greener-reporter-py](https://github.com/cephei8/greener-reporter-py)
-- JavaScript library for implementing reporters: [cephei8/greener-reporter-js](https://github.com/cephei8/greener-reporter-js)
-- C FFI library for implementing reporters: [cephei8/greener-reporter](https://github.com/cephei8/greener-reporter)
+- Python library for implementing reporters: [~cephei8/greener-reporter-py](https://git.sr.ht/~cephei8/greener-reporter-py)
+- JavaScript library for implementing reporters: [~cephei8/greener-reporter-js](https://git.sr.ht/~cephei8/greener-reporter-js)
+- C FFI library for implementing reporters: [~cephei8/greener-reporter](https://git.sr.ht/~cephei8/greener-reporter)
 
 ## Contributing
 See [CONTRIBUTING.md](./CONTRIBUTING.md).

@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/cephei8/greener/core"
+	"git.sr.ht/~cephei8/greener/core"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

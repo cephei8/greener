@@ -1,6 +1,6 @@
 site_name: Greener
 site_url: https://greener.cephei8.dev
-repo_url: https://github.com/cephei8/greener
+repo_url: https://git.sr.ht/~cephei8/greener
 docs_dir: content
 nav:
   - Greener: index.md
@@ -14,7 +14,7 @@ nav:
 theme:
   name: material
   icon:
-    repo: fontawesome/brands/github
+    repo: fontawesome/brands/git-alt
   palette:
     - media: "(prefers-color-scheme)"
       toggle:
@@ -53,5 +53,5 @@ extra:
   social:
     - icon: fontawesome/brands/docker
       link: https://hub.docker.com/r/cephei8/greener
-    - icon: fontawesome/brands/github
-      link: https://github.com/cephei8/greener
+    - icon: fontawesome/brands/git-alt
+      link: https://git.sr.ht/~cephei8/greener

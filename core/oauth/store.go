@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	model_db "github.com/cephei8/greener/core/model/db"
+	model_db "git.sr.ht/~cephei8/greener/core/model/db"
 	"github.com/go-oauth2/oauth2/v4"
 	"github.com/go-oauth2/oauth2/v4/models"
 	"github.com/google/uuid"
@@ -16,12 +16,12 @@ import (
 type OAuthClient struct {
 	bun.BaseModel `bun:"table:oauth_clients"`
 
-	ID           string              `bun:"id,pk"`
-	SecretHash   []byte              `bun:"secret_hash"`
-	Name         string              `bun:"name,notnull"`
-	RedirectURIs string              `bun:"redirect_uris,notnull"`
+	ID           string               `bun:"id,pk"`
+	SecretHash   []byte               `bun:"secret_hash"`
+	Name         string               `bun:"name,notnull"`
+	RedirectURIs string               `bun:"redirect_uris,notnull"`
 	UserID       *model_db.BinaryUUID `bun:"user_id"`
-	CreatedAt    time.Time           `bun:"created_at,nullzero,notnull"`
+	CreatedAt    time.Time            `bun:"created_at,nullzero,notnull"`
 }
 
 type OAuthToken struct {
