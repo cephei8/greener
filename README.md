@@ -20,7 +20,7 @@ Features:
 
 
 
-Check out [Greener Documentation](https://greener.cephei8.dev) for details.
+Check out [Greener Documentation](https://man.sr.ht/~cephei8/greener-docs/) for details.
 
 Demo:
 ![Demo](./docs/content/assets/demo.gif)
