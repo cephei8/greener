@@ -1,9 +1,7 @@
 # Contributing
 
-- [Greener Discussions](https://github.com/cephei8/greener/discussions)
-- [Greener Issues](https://github.com/cephei8/greener/issues)
-
-## Pull requests
+## Patches
+Send patches to https://lists.sr.ht/~cephei8/greener mailing list.
 
 ### Developer Certificate of Origin
 All commits submitted to this project must include a sign-off (a valid "Signed-off-by" line created using `git commit -s`).<br>

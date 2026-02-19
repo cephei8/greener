@@ -23,7 +23,7 @@ docker run --rm \
 
 Create user:
 ``` shell
-go install github.com/cephei8/greener/cmd/greener-admin@main
+go install git.sr.ht/~cephei8/greener/cmd/greener-admin@main
 
 greener-admin \
     --db-url sqlite:///greener-data/greener.db \

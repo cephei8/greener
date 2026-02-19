@@ -1,5 +1,5 @@
 packages:
-  github.com/cephei8/greener/core:
+  git.sr.ht/~cephei8/greener/core:
     config:
       dir: "{{.InterfaceDir}}"
       filename: query_service_mock.go
