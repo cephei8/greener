@@ -1,5 +1,9 @@
 # Greener
 
+> Project: https://sr.ht/~cephei8/greener<br/>
+> Main repo: https://git.sr.ht/~cephei8/greener<br/>
+> Documentation: https://man.sr.ht/~cephei8/greener-docs
+
 [![Docker Image Version](https://img.shields.io/docker/v/cephei8/greener)](https://hub.docker.com/r/cephei8/greener)
 
 Greener is a lean and mean test result explorer.
