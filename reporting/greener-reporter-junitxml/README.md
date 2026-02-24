@@ -12,6 +12,6 @@ $ go install codeberg.org/cephei8/reporting/greener-reporter-junitxml@latest
 $ greener-reporter-junitxml -f junit-report.xml
 ```
 
-Check out [Greener documentation](https://codeberg.org/cephei8/greener/src/branch/main/index.md) or [the main Greener repo](https://codeberg.org/cephei8/greener) for details on how to run the Greener server.
+Check out [Greener repository](https://codeberg.org/cephei8/greener) for details on how to run the Greener server.
 
-For all the reporter configuration options see `greener-reporter-junitxml --help` or [Plugin Configuration](https://codeberg.org/cephei8/greener/src/branch/main/index.md#plugin-configuration).
+For all the reporter configuration options see `greener-reporter-junitxml --help` or [Plugin Configuration](https://codeberg.org/cephei8/greener#plugin-configuration).
