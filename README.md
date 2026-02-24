@@ -1,8 +1,6 @@
 # Greener
 
-> Project: https://sr.ht/~cephei8/greener<br/>
-> Main repo: https://git.sr.ht/~cephei8/greener<br/>
-> Documentation: https://man.sr.ht/~cephei8/greener-docs
+> Project: https://sr.ht/~cephei8/greener
 
 [![Docker Image Version](https://img.shields.io/docker/v/cephei8/greener)](https://hub.docker.com/r/cephei8/greener)
 
@@ -48,7 +46,7 @@ docker run --rm \
     cephei8/greener:latest
 
 # create user (--role: editor or viewer, default: viewer)
-go install git.sr.ht/~cephei8/greener/cmd/greener-admin@main
+go install git.sr.ht/~cephei8/greener/server/cmd/greener-admin@main
 
 greener-admin \
     --db-url sqlite:///greener-data/greener.db \
@@ -61,11 +59,13 @@ greener-admin \
 Then open <http://localhost:8080> in your browser.
 
 #### Docker Compose
-Check out [compose.yaml](https://git.sr.ht/~cephei8/greener/tree/main/item/compose.yaml) for example of using Docker Compose and PostgreSQL.
+Check out [compose.yaml](https://git.sr.ht/~cephei8/greener/tree/main/item/server/compose.yaml) for example of using Docker Compose and PostgreSQL.
 
 ### Building from source
 
 ```bash
+cd server
+
 # build
 npm install
 npm run build
@@ -77,7 +77,7 @@ mkdir greener-data
 ./greener --db-url "sqlite:///greener-data/greener.db" --auth-secret "my-secret"
 
 # create user (--role: editor or viewer, default: viewer)
-go install git.sr.ht/~cephei8/greener/cmd/greener-admin@main
+go install git.sr.ht/~cephei8/greener/server/cmd/greener-admin@main
 
 greener-admin \
     --db-url sqlite:///greener-data/greener.db \
