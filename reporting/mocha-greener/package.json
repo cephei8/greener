@@ -1,0 +1,24 @@
+{
+    "name": "mocha-greener",
+    "version": "0.14.1",
+    "author": "cephei8",
+    "homepage": "https://sr.ht/~cephei8/greener/",
+    "license": "Apache-2.0",
+    "description": "Mocha reporter for Greener",
+    "main": "index.js",
+    "files": ["/LICENSE", "/README.md", "/index.js", "/package.json"],
+    "repository": {
+        "type": "git",
+        "url": "git+https://git.sr.ht/~cephei8/greener.git",
+        "directory": "reporting/mocha-greener"
+    },
+    "dependencies": {
+        "greener-reporter": "0.14.0"
+    },
+    "devDependencies": {
+        "mocha": "^11.7.5"
+    },
+    "scripts": {
+        "test": "mocha --reporter index.js"
+    }
+}
