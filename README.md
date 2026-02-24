@@ -110,8 +110,5 @@ Supporting libraries:
 - JavaScript library for implementing reporters: [greener-reporter-js](./reporting/greener-reporter-js)
 - C FFI library for implementing reporters: [greener-reporter](./reporting/greener-reporter)
 
-## Contributing
-See [CONTRIBUTING.md](./CONTRIBUTING.md).
-
 ## License
 This project is licensed under the terms of the [Apache License 2.0](./LICENSE).
