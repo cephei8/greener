@@ -107,19 +107,19 @@ The default role is `viewer`.
 ## Test framework plugins
 | Programming Language | Framework | Package                                                      | Repository                                                                    |
 |:---------------------|:----------|:-------------------------------------------------------------|:------------------------------------------------------------------------------|
-| Python               | pytest    | [pytest-greener](https://pypi.org/project/pytest-greener/)   | [~cephei8/pytest-greener](https://git.sr.ht/~cephei8/pytest-greener)           |
-| JavaScript           | Jest      | [jest-greener](https://www.npmjs.com/package/jest-greener)   | [~cephei8/jest-greener](https://git.sr.ht/~cephei8/jest-greener)               |
-| JavaScript           | Mocha     | [mocha-greener](https://www.npmjs.com/package/mocha-greener) | [~cephei8/mocha-greener](https://git.sr.ht/~cephei8/mocha-greener)             |
-| Go                   | N/A       | N/A                                                          | [~cephei8/greener-reporter-go](https://git.sr.ht/~cephei8/greener-reporter-go) |
+| Python               | pytest    | [pytest-greener](https://pypi.org/project/pytest-greener/)   | [reporting/pytest-greener](https://git.sr.ht/~cephei8/greener/tree/main/item/reporting/pytest-greener)           |
+| JavaScript           | Jest      | [jest-greener](https://www.npmjs.com/package/jest-greener)   | [reporting/jest-greener](https://git.sr.ht/~cephei8/greener/tree/main/item/reporting/jest-greener)               |
+| JavaScript           | Mocha     | [mocha-greener](https://www.npmjs.com/package/mocha-greener) | [reporting/mocha-greener](https://git.sr.ht/~cephei8/greener/tree/main/item/reporting/mocha-greener)             |
+| Go                   | N/A       | N/A                                                          | [reporting/greener-reporter-go](https://git.sr.ht/~cephei8/greener/tree/main/item/reporting/greener-reporter-go) |
 
 ## Generic
-- Tool to report JUnit XML results: [~cephei8/greener-reporter-junitxml](https://git.sr.ht/~cephei8/greener-reporter-junitxml)
-- CLI tool to report test results: [~cephei8/greener-reporter-cli](https://git.sr.ht/~cephei8/greener-reporter-cli)
+- Tool to report JUnit XML results: [greener-reporter-junitxml](https://git.sr.ht/~cephei8/greener/tree/main/item/reporting/greener-reporter-junitxml)
+- CLI tool to report test results: [greener-reporter-cli](https://git.sr.ht/~cephei8/greener/tree/main/item/reporting/greener-reporter-cli)
 
 ## Supporting libraries
-- Python library for implementing reporters: [~cephei8/greener-reporter-py](https://git.sr.ht/~cephei8/greener-reporter-py)
-- JavaScript library for implementing reporters: [~cephei8/greener-reporter-js](https://git.sr.ht/~cephei8/greener-reporter-js)
-- C FFI library for implementing reporters: [~cephei8/greener-reporter](https://git.sr.ht/~cephei8/greener-reporter)
+- Python library for implementing reporters: [greener-reporter-py](https://git.sr.ht/~cephei8/greener/tree/main/item/reporting/greener-reporter-py)
+- JavaScript library for implementing reporters: [greener-reporter-js](https://git.sr.ht/~cephei8/greener/tree/main/item/reporting/greener-reporter-js)
+- C FFI library for implementing reporters: [greener-reporter](https://git.sr.ht/~cephei8/greener/tree/main/item/reporting/greener-reporter)
 
 # Query Language
 
