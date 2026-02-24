@@ -3,8 +3,8 @@ package core
 import (
 	"fmt"
 
-	"git.sr.ht/~cephei8/greener/server/core/model/db"
-	"git.sr.ht/~cephei8/greener/server/core/query"
+	"codeberg.org/cephei8/greener/server/core/model/db"
+	"codeberg.org/cephei8/greener/server/core/query"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 )
