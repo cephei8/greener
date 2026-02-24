@@ -1,0 +1,14 @@
+{
+    "name": "greener-servermock",
+    "version": "0.0.0",
+    "main": "index.js",
+    "binary": {
+        "napi_versions": [9]
+    },
+    "gypfile": false,
+    "devDependencies": {
+        "node-gyp": "^12.1.0",
+        "prebuildify": "^6.0.1"
+    },
+    "private": true
+}
