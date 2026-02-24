@@ -1,4 +1,4 @@
-module git.sr.ht/~cephei8/greener/server
+module codeberg.org/cephei8/greener/server
 
 go 1.25.4
 

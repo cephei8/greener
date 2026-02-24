@@ -1,7 +1,5 @@
 # Greener
 
-> Project: https://sr.ht/~cephei8/greener
-
 [![Docker Image Version](https://img.shields.io/docker/v/cephei8/greener)](https://hub.docker.com/r/cephei8/greener)
 
 Greener is a lean and mean test result explorer.
@@ -22,7 +20,7 @@ Features:
 
 
 
-Check out [Greener Documentation](https://man.sr.ht/~cephei8/greener-docs/) for details.
+Check out [Greener Documentation](https://codeberg.org/cephei8/greener/src/branch/main/index.md) for details.
 
 Demo:
 ![Demo](./docs/content/assets/demo.gif)
@@ -46,7 +44,7 @@ docker run --rm \
     cephei8/greener:latest
 
 # create user (--role: editor or viewer, default: viewer)
-go install git.sr.ht/~cephei8/greener/server/cmd/greener-admin@main
+go install codeberg.org/cephei8/greener/server/cmd/greener-admin@main
 
 greener-admin \
     --db-url sqlite:///greener-data/greener.db \
@@ -59,7 +57,7 @@ greener-admin \
 Then open <http://localhost:8080> in your browser.
 
 #### Docker Compose
-Check out [compose.yaml](https://git.sr.ht/~cephei8/greener/tree/main/item/server/compose.yaml) for example of using Docker Compose and PostgreSQL.
+Check out [compose.yaml](https://codeberg.org/cephei8/greener/src/branch/main/server/compose.yaml) for example of using Docker Compose and PostgreSQL.
 
 ### Building from source
 
@@ -77,7 +75,7 @@ mkdir greener-data
 ./greener --db-url "sqlite:///greener-data/greener.db" --auth-secret "my-secret"
 
 # create user (--role: editor or viewer, default: viewer)
-go install git.sr.ht/~cephei8/greener/server/cmd/greener-admin@main
+go install codeberg.org/cephei8/greener/server/cmd/greener-admin@main
 
 greener-admin \
     --db-url sqlite:///greener-data/greener.db \

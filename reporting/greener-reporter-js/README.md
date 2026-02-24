@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/greener-reporter.svg)](https://www.npmjs.com/package/greener-reporter)
 
-JavaScript library for implementing reporters for [Greener](https://sr.ht/~cephei8/greener/).<br>
+JavaScript library for implementing reporters for [Greener](https://codeberg.org/cephei8/greener/).<br>
 
 Used by test reporters for Greener:
 - Jest reporter: [jest-greener](../jest-greener)
