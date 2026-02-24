@@ -93,22 +93,22 @@ Then open <http://localhost:8080> in your browser.
 
 Check out [Ecosystem section](#ecosystem) for ways to report test results to Greener.
 
-For the "hello world" the easiest option may be to use [~cephei8/greener-reporter-cli](https://git.sr.ht/~cephei8/greener-reporter-cli).
+For the "hello world" the easiest option may be to use [greener-reporter-cli](./reporting/greener-reporter-cli).
 
 ## Ecosystem
 
 Plugins/reporters:
-- pytest plugin: [~cephei8/pytest-greener](https://git.sr.ht/~cephei8/pytest-greener)
-- Jest reporter: [~cephei8/jest-greener](https://git.sr.ht/~cephei8/jest-greener)
-- Mocha reporter: [~cephei8/mocha-greener](https://git.sr.ht/~cephei8/mocha-greener)
-- Tool to report Go test results: [~cephei8/greener-reporter-go](https://git.sr.ht/~cephei8/greener-reporter-go)
-- Tool to report JUnit XML results: [~cephei8/greener-reporter-junitxml](https://git.sr.ht/~cephei8/greener-reporter-junitxml)
-- CLI tool to report test results: [~cephei8/greener-reporter-cli](https://git.sr.ht/~cephei8/greener-reporter-cli)
+- pytest plugin: [pytest-greener](./reporting/pytest-greener)
+- Jest reporter: [jest-greener](./reporting/jest-greener)
+- Mocha reporter: [mocha-greener](./reporting/mocha-greener)
+- Tool to report Go test results: [greener-reporter-go](./reporting/greener-reporter-go)
+- Tool to report JUnit XML results: [greener-reporter-junitxml](./reporting/greener-reporter-junitxml)
+- CLI tool to report test results: [greener-reporter-cli](./reporting/greener-reporter-cli)
 
 Supporting libraries:
-- Python library for implementing reporters: [~cephei8/greener-reporter-py](https://git.sr.ht/~cephei8/greener-reporter-py)
-- JavaScript library for implementing reporters: [~cephei8/greener-reporter-js](https://git.sr.ht/~cephei8/greener-reporter-js)
-- C FFI library for implementing reporters: [~cephei8/greener-reporter](https://git.sr.ht/~cephei8/greener-reporter)
+- Python library for implementing reporters: [greener-reporter-py](./reporting/greener-reporter-py)
+- JavaScript library for implementing reporters: [greener-reporter-js](./reporting/greener-reporter-js)
+- C FFI library for implementing reporters: [greener-reporter](./reporting/greener-reporter)
 
 ## Contributing
 See [CONTRIBUTING.md](./CONTRIBUTING.md).
