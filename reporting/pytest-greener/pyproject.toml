@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "pytest-greener"
+version = "0.13.0"
+description = "Pytest plugin for Greener"
+authors = ["cephei8"]
+readme = "README.md"
+
+[tool.poetry.plugins]
+pytest11 = { greener = "pytest_greener.plugin" }
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pytest = "^8.3.3"
+greener-reporter = "0.13.0"
+
+[tool.poetry.group.test.dependencies]
+coverage = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+pytester_example_dir = "tests/examples"
+norecursedirs = "tests/examples"
