@@ -93,22 +93,22 @@ Then open <http://localhost:8080> in your browser.
 
 Check out [Ecosystem section](#ecosystem) for ways to report test results to Greener.
 
-For the "hello world" the easiest option may be to use [greener-reporter-cli](./reporting/greener-reporter-cli/README.md).
+For the "hello world" the easiest option may be to use [greener-reporter-cli](./reporting/greener-reporter-cli).
 
 ## Ecosystem
 
 Plugins/reporters:
-- pytest plugin: [pytest-greener](./reporting/pytest-greener/README.md)
-- Jest reporter: [jest-greener](./reporting/jest-greener/README.md)
-- Mocha reporter: [mocha-greener](./reporting/mocha-greener/README.md)
-- Tool to report Go test results: [greener-reporter-go](./reporting/greener-reporter-go/README.md)
-- Tool to report JUnit XML results: [greener-reporter-junitxml](./reporting/greener-reporter-junitxml/README.md)
-- CLI tool to report test results: [greener-reporter-cli](./reporting/greener-reporter-cli/README.md)
+- pytest plugin: [pytest-greener](./reporting/pytest-greener)
+- Jest reporter: [jest-greener](./reporting/jest-greener)
+- Mocha reporter: [mocha-greener](./reporting/mocha-greener)
+- Tool to report Go test results: [greener-reporter-go](./reporting/greener-reporter-go)
+- Tool to report JUnit XML results: [greener-reporter-junitxml](./reporting/greener-reporter-junitxml)
+- CLI tool to report test results: [greener-reporter-cli](./reporting/greener-reporter-cli)
 
 Supporting libraries:
-- Python library for implementing reporters: [greener-reporter-py](./reporting/greener-reporter-py/README.md)
-- JavaScript library for implementing reporters: [greener-reporter-js](./reporting/greener-reporter-js/README.md)
-- C FFI library for implementing reporters: [greener-reporter](./reporting/greener-reporter/README.md)
+- Python library for implementing reporters: [greener-reporter-py](./reporting/greener-reporter-py)
+- JavaScript library for implementing reporters: [greener-reporter-js](./reporting/greener-reporter-js)
+- C FFI library for implementing reporters: [greener-reporter](./reporting/greener-reporter)
 
 ## Contributing
 See [CONTRIBUTING.md](./CONTRIBUTING.md).
