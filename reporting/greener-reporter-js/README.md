@@ -5,8 +5,8 @@
 JavaScript library for implementing reporters for [Greener](https://sr.ht/~cephei8/greener/).<br>
 
 Used by test reporters for Greener:
-- Jest reporter: [jest-greener](../jest-greener)
-- Mocha reporter: [mocha-greener](../mocha-greener)
+- Jest reporter: [jest-greener](../jest-greener/README.md)
+- Mocha reporter: [mocha-greener](../mocha-greener/README.md)
 
 ## License
 This project is licensed under the terms of the [Apache License 2.0](./LICENSE).
