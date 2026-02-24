@@ -1,0 +1,16 @@
+/.direnv
+/greener
+/greener-admin
+/cmd/greener/greener
+/cmd/greener/greener-admin
+
+/greener.db
+/greener.db-shm
+/greener.db-wal
+/greener-data
+
+
+/node_modules
+/assets/static/dist
+
+/core/query/y.output
