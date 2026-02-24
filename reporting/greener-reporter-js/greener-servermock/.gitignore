@@ -1,0 +1,11 @@
+/dist
+
+/build
+/build-debug
+
+/.cache
+/compile_commands.json
+
+/node_modules
+/package-lock.json
+/prebuilds
