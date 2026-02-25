@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     {name = "cephei8"}
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
     "aiohttp>=3.8.0",
 ]
@@ -17,12 +17,12 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 aiohttp = "^3.8.0"
 
 [tool.poetry.group.test.dependencies]
-pytest = "^7.0"
-pytest-asyncio = "^0.21"
+pytest = "^8.4"
+pytest-asyncio = "^1.2"
 pydantic = "^2.0"
 
 [build-system]

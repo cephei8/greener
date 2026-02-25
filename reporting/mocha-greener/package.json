@@ -13,7 +13,7 @@
         "directory": "reporting/mocha-greener"
     },
     "dependencies": {
-        "greener-reporter": "0.14.0"
+        "greener-reporter": "0.14.1"
     },
     "devDependencies": {
         "mocha": "^11.7.5"
