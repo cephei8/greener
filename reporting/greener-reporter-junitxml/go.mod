@@ -1,4 +1,4 @@
-module codeberg.org/cephei8/reporting/greener-reporter-junitxml
+module github.com/cephei8/reporting/greener-reporter-junitxml
 
 go 1.25.5
 

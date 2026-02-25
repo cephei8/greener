@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	model_db "codeberg.org/cephei8/greener/server/core/model/db"
+	model_db "github.com/cephei8/greener/server/core/model/db"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )

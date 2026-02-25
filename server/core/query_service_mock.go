@@ -7,8 +7,8 @@ package core
 import (
 	"context"
 
-	"codeberg.org/cephei8/greener/server/core/model/api"
-	"codeberg.org/cephei8/greener/server/core/model/db"
+	"github.com/cephei8/greener/server/core/model/api"
+	"github.com/cephei8/greener/server/core/model/db"
 	"github.com/google/uuid"
 	mock "github.com/stretchr/testify/mock"
 )

@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"codeberg.org/cephei8/greener/server/core"
-	"codeberg.org/cephei8/greener/server/core/model/db"
+	"github.com/cephei8/greener/server/core"
+	"github.com/cephei8/greener/server/core/model/db"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"

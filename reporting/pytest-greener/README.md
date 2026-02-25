@@ -2,7 +2,7 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/pytest-greener.svg)](https://pypi.org/project/pytest-greener/)
 
-Pytest plugin for [Greener](https://codeberg.org/cephei8/greener/).
+Pytest plugin for [Greener](https://github.com/cephei8/greener/).
 
 ## Usage
 ```console
@@ -13,9 +13,9 @@ $ pip install pytest-greener
 $ pytest --greener
 ```
 
-Check out [Greener repository](https://codeberg.org/cephei8/greener) for details on how to run the Greener server.
+Check out [Greener repository](https://github.com/cephei8/greener) for details on how to run the Greener server.
 
-For all the plugin configuration options see [Plugin Configuration](https://codeberg.org/cephei8/greener#plugin-configuration).
+For all the plugin configuration options see [Plugin Configuration](https://github.com/cephei8/greener#plugin-configuration).
 
 ## License
 This project is licensed under the terms of the [Apache License 2.0](./LICENSE).
