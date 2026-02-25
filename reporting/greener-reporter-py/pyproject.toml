@@ -21,7 +21,7 @@ python = "^3.8"
 aiohttp = "^3.8.0"
 
 [tool.poetry.group.test.dependencies]
-pytest = "^7.0"
+pytest = "^8.4"
 pytest-asyncio = "^0.21"
 pydantic = "^2.0"
 
