@@ -3,7 +3,7 @@ package mcp
 import (
 	"context"
 
-	model_db "codeberg.org/cephei8/greener/server/core/model/db"
+	model_db "github.com/cephei8/greener/server/core/model/db"
 	"github.com/google/uuid"
 )
 

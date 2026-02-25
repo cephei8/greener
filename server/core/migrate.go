@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strings"
 
-	"codeberg.org/cephei8/greener/server/assets"
+	"github.com/cephei8/greener/server/assets"
 	"github.com/amacneil/dbmate/v2/pkg/dbmate"
 	_ "github.com/amacneil/dbmate/v2/pkg/driver/mysql"
 	_ "github.com/amacneil/dbmate/v2/pkg/driver/postgres"

@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"codeberg.org/cephei8/greener/server/core"
-	model_api "codeberg.org/cephei8/greener/server/core/model/api"
+	"github.com/cephei8/greener/server/core"
+	model_api "github.com/cephei8/greener/server/core/model/api"
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo/v4"

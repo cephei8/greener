@@ -39,7 +39,7 @@ docker run --rm \
     cephei8/greener:latest
 
 # create user (--role: editor or viewer, default: viewer)
-go install codeberg.org/cephei8/greener/server/cmd/greener-admin@main
+go install github.com/cephei8/greener/server/cmd/greener-admin@main
 
 greener-admin \
     --db-url sqlite:///greener-data/greener.db \
@@ -52,7 +52,7 @@ greener-admin \
 Then open <http://localhost:8080> in your browser.
 
 #### Docker Compose
-Check out [compose.yaml](https://codeberg.org/cephei8/greener/src/branch/main/server/compose.yaml) for example of using Docker Compose and PostgreSQL.
+Check out [compose.yaml](https://github.com/cephei8/greener/blob/main/server/compose.yaml) for example of using Docker Compose and PostgreSQL.
 
 ### Building from source
 
@@ -70,7 +70,7 @@ mkdir greener-data
 ./greener --db-url "sqlite:///greener-data/greener.db" --auth-secret "my-secret"
 
 # create user (--role: editor or viewer, default: viewer)
-go install codeberg.org/cephei8/greener/server/cmd/greener-admin@main
+go install github.com/cephei8/greener/server/cmd/greener-admin@main
 
 greener-admin \
     --db-url sqlite:///greener-data/greener.db \
