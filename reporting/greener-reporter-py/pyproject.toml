@@ -22,7 +22,7 @@ aiohttp = "^3.8.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.4"
-pytest-asyncio = "^0.21"
+pytest-asyncio = "^1.2"
 pydantic = "^2.0"
 
 [build-system]
