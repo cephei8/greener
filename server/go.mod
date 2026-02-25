@@ -9,7 +9,7 @@ require (
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/sessions v1.4.0
-	github.com/labstack/echo-contrib v0.17.4
+	github.com/labstack/echo-contrib v0.50.1
 	github.com/labstack/echo/v4 v4.15.0
 	github.com/mark3labs/mcp-go v0.44.0
 	github.com/stretchr/testify v1.11.1
