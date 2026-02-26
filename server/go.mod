@@ -4,7 +4,7 @@ go 1.25.4
 
 require (
 	github.com/amacneil/dbmate/v2 v2.31.0
-	github.com/caarlos0/env/v11 v11.3.1
+	github.com/caarlos0/env/v11 v11.4.0
 	github.com/go-oauth2/oauth2/v4 v4.5.4
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/google/uuid v1.6.0
