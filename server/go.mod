@@ -16,10 +16,10 @@ require (
 	github.com/testcontainers/testcontainers-go v0.40.0
 	github.com/testcontainers/testcontainers-go/modules/mysql v0.40.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.40.0
-	github.com/uptrace/bun v1.2.17
+	github.com/uptrace/bun v1.2.18
 	github.com/uptrace/bun/dialect/mysqldialect v1.2.17
 	github.com/uptrace/bun/dialect/pgdialect v1.2.17
-	github.com/uptrace/bun/dialect/sqlitedialect v1.2.17
+	github.com/uptrace/bun/dialect/sqlitedialect v1.2.18
 	github.com/uptrace/bun/driver/pgdriver v1.2.17
 	github.com/uptrace/bun/driver/sqliteshim v1.2.17
 	github.com/urfave/cli/v3 v3.6.2
