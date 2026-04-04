@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/cephei8/greener/server/core/model/db"
+	"git.sr.ht/~cephei8/greener/server/core/model/db"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/uptrace/bun"

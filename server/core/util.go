@@ -3,7 +3,7 @@ package core
 import (
 	"fmt"
 
-	"github.com/cephei8/greener/server/core/model/db"
+	"git.sr.ht/~cephei8/greener/server/core/model/db"
 )
 
 func TestcaseStatusFromString(status string) (model_db.TestcaseStatus, error) {

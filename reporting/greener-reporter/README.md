@@ -1,5 +1,5 @@
 # Greener Reporter Lib
 
-C FFI library for implementing reporters for [Greener](https://github.com/cephei8/greener/).
+C FFI library for implementing reporters for [Greener](https://git.sr.ht/~cephei8/greener).
 
 The `greener_servermock` library can be used independently for testing reporters, even if they don't use the `greener_reporter` library.

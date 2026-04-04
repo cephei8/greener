@@ -6,9 +6,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/cephei8/greener/server/core"
-	model_api "github.com/cephei8/greener/server/core/model/api"
-	model_db "github.com/cephei8/greener/server/core/model/db"
+	"git.sr.ht/~cephei8/greener/server/core"
+	model_api "git.sr.ht/~cephei8/greener/server/core/model/api"
+	model_db "git.sr.ht/~cephei8/greener/server/core/model/db"
 	"github.com/google/uuid"
 	mcpgo "github.com/mark3labs/mcp-go/mcp"
 	"github.com/stretchr/testify/assert"
