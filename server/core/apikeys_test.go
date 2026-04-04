@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cephei8/greener/server/core"
-	model_db "github.com/cephei8/greener/server/core/model/db"
+	"git.sr.ht/~cephei8/greener/server/core"
+	model_db "git.sr.ht/~cephei8/greener/server/core/model/db"
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo/v4"

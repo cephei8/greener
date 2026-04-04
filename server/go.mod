@@ -1,4 +1,4 @@
-module github.com/cephei8/greener/server
+module git.sr.ht/~cephei8/greener/server
 
 go 1.25.4
 

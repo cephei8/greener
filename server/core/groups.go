@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	model_api "github.com/cephei8/greener/server/core/model/api"
-	model_db "github.com/cephei8/greener/server/core/model/db"
+	model_api "git.sr.ht/~cephei8/greener/server/core/model/api"
+	model_db "git.sr.ht/~cephei8/greener/server/core/model/db"
 	"github.com/google/uuid"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
