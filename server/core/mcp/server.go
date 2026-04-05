@@ -3,9 +3,9 @@ package mcp
 import (
 	"net/http"
 
-	"git.sr.ht/~cephei8/greener/server/core"
-	"git.sr.ht/~cephei8/greener/server/core/oauth"
-	"git.sr.ht/~cephei8/greener/server/core/sse"
+	"github.com/cephei8/greener/server/core"
+	"github.com/cephei8/greener/server/core/oauth"
+	"github.com/cephei8/greener/server/core/sse"
 	"github.com/labstack/echo/v4"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 	"github.com/uptrace/bun"

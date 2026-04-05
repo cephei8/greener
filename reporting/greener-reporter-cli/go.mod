@@ -1,4 +1,4 @@
-module git.sr.ht/~cephei8/greener/reporting/greener-reporter-cli
+module github.com/cephei8/greener/reporting/greener-reporter-cli
 
 go 1.25.5
 

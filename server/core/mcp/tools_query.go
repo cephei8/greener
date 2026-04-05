@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"git.sr.ht/~cephei8/greener/server/core"
-	model_db "git.sr.ht/~cephei8/greener/server/core/model/db"
+	"github.com/cephei8/greener/server/core"
+	model_db "github.com/cephei8/greener/server/core/model/db"
 	"github.com/google/uuid"
 	"github.com/mark3labs/mcp-go/mcp"
 )
