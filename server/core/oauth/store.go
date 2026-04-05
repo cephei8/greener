@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	model_db "git.sr.ht/~cephei8/greener/server/core/model/db"
+	model_db "github.com/cephei8/greener/server/core/model/db"
 	"github.com/go-oauth2/oauth2/v4"
 	"github.com/go-oauth2/oauth2/v4/models"
 	"github.com/google/uuid"

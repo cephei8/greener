@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"git.sr.ht/~cephei8/greener/server/core"
-	"git.sr.ht/~cephei8/greener/server/core/model/db"
-	"git.sr.ht/~cephei8/greener/server/core/query"
+	"github.com/cephei8/greener/server/core"
+	"github.com/cephei8/greener/server/core/model/db"
+	"github.com/cephei8/greener/server/core/query"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
